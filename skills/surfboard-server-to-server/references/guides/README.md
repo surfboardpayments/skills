@@ -1,6 +1,6 @@
 # surfboard-server-to-server: bundled guides
 
-Generated from https://www.surfboardpayments.com/api/ai/guides.json (44 guides, updated 2026-08-13).
+Generated from https://www.surfboardpayments.com/api/ai/guides.json (45 guides, updated 2026-08-14).
 Do not edit these by hand; edit the guide on the marketing site and re-run `npm run skills`.
 
 - [Server-to-Server API](./server-to-server-api.md): Process online payments entirely from your backend with Merchant Initiated Transactions. Full control over recurring payments, subscriptions, and tokenized card flows.

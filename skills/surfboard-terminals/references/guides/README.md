@@ -1,6 +1,6 @@
 # surfboard-terminals: bundled guides
 
-Generated from https://www.surfboardpayments.com/api/ai/guides.json (44 guides, updated 2026-08-13).
+Generated from https://www.surfboardpayments.com/api/ai/guides.json (45 guides, updated 2026-08-14).
 Do not edit these by hand; edit the guide on the marketing site and re-run `npm run skills`.
 
 - [Device Registration](./device-registration.md): Register a terminal to a store before it can take payments or receive a partner POS app. Covers rotating codes, QR/registration links, pre-shipped codes, and in-app registration for SoftPOS.

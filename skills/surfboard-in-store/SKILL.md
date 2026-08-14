@@ -7,6 +7,36 @@ description: "Build in-store card payments with Surfboard Payments: create an or
 
 Read `surfboard-payments` first. Terminal registration itself is `surfboard-terminals`.
 
+## Check the terminal type before you write anything
+
+```
+GET {SURFBOARD_API_URL}/terminals/:terminalId
+```
+
+Read `terminalType`. This decides whether the flow below is achievable at all, and it
+is not a detail you can defer.
+
+| `terminalType` | Server-initiated payment | What to do |
+|---|---|---|
+| Networked EMV terminal | Yes | Follow this skill. |
+| `checkoutX` (SoftPOS) | **No** | See below before writing code. |
+
+**SoftPOS payments cannot be completed from a server.** A `checkoutX` terminal reports
+`ACTIVE`, accepts the create-order call, and returns a real `orderId`, `paymentId`, and
+`interAppJWT`. That is step 1 of 2. Step 2 is a native app switch on the same physical
+device, launching `checkoutx://com.surfboard.checkoutx/...` with the `interAppJWT` from
+a point-of-sale app installed alongside it. There is no server-side substitute.
+
+If the POS is a web application, or runs on a different machine from the terminal, a
+SoftPOS terminal **cannot take a payment through it**. What you will observe instead is
+a `PAYMENT_FAILED` a few seconds after initiation, with no card ever prompted for and
+the generic message "An error occurred during transaction processing." Nothing in that
+points at the architecture, so say it plainly to the user now rather than letting them
+debug the card, the amount, or the credentials.
+
+Either target a networked terminal, or build the POS as a native app on the device and
+follow `references/guides/interapp-integration.md`.
+
 ## The flow
 
 ```
@@ -19,7 +49,7 @@ round trip instead of two.
 ## 1. Create an order and initiate payment
 
 ```
-POST {SURFBOARD_API_URL}/merchants/:merchantId/orders
+POST {SURFBOARD_API_URL}/orders
 ```
 
 ```json
@@ -63,9 +93,28 @@ Response:
 **Store both IDs.** `orderId` for refunds and reporting, `paymentId` for status,
 captures, and voids.
 
-Remember: amounts are integers in minor units (`4500` is 45.00), currency is the
-numeric ISO 4217 code as a string (`"752"`, not `"SEK"`), and `terminal$id` needs
-quoting in most ORMs and template languages.
+### Three things about `amount` that examples hide
+
+Every example in the documentation uses `quantity: 1`, so none of these surface until
+you build a real cart.
+
+**`total` is the price of one unit, not the line.** Despite being documented as "total
+line amount", it must equal `regular + shipping - campaign` for a single unit. The
+order total is `sum(total * quantity)`. Sending `4500 * 2 = 9000` on a line of
+quantity 2 is rejected with `P_0001 ... Invalid item price for item id`.
+
+**`amount.tax` is required on every line**, including zero-VAT lines, where you still
+send a `0` percentage entry. It is documented as optional. Omitting it returns
+`P_0001 ... Cannot read properties of undefined (reading 'vatValue')`, which is an
+internal null dereference leaking out as a validation message. If you see `vatValue`,
+a line is missing its tax array.
+
+**Prices include tax.** `total` equals `regular`; the tax array reports the VAT
+contained in that price. Never add tax on top. See `surfboard-payments`.
+
+Also: amounts are integers in minor units (`4500` is 45.00), currency is the numeric
+ISO 4217 code as a string (`"752"`, not `"SEK"`), and `terminal$id` needs quoting in
+most ORMs and template languages.
 
 Payment methods: `CARD`, `SWISH`, `KLARNA`.
 
@@ -101,7 +150,8 @@ const h = {
   'API-SECRET': process.env.SURFBOARD_API_SECRET!,
   'MERCHANT-ID': process.env.SURFBOARD_MERCHANT_ID!,
 }
-const base = `${process.env.SURFBOARD_API_URL}/merchants/${process.env.SURFBOARD_MERCHANT_ID}`
+// Orders are not merchant-scoped. The merchant travels in the MERCHANT-ID header.
+const base = process.env.SURFBOARD_API_URL
 
 export async function charge(minorUnits: number, terminalId: string) {
   const amount = { regular: minorUnits, total: minorUnits, currency: '752' }
@@ -118,7 +168,8 @@ export async function charge(minorUnits: number, terminalId: string) {
   })
 
   const body = await res.json()
-  if (body.status !== 'SUCCESS') throw new Error(body.message) // status, not res.ok
+  // Errors come back 2xx, usually 201. Never trust the HTTP code here.
+  if (body.status !== 'SUCCESS') throw new Error(body.message)
   return body.data // { orderId, paymentId }
 }
 ```
@@ -132,7 +183,8 @@ H = {
     "API-SECRET": os.environ["SURFBOARD_API_SECRET"],
     "MERCHANT-ID": os.environ["SURFBOARD_MERCHANT_ID"],
 }
-BASE = f'{os.environ["SURFBOARD_API_URL"]}/merchants/{os.environ["SURFBOARD_MERCHANT_ID"]}'
+# Orders are not merchant-scoped. The merchant travels in the MERCHANT-ID header.
+BASE = os.environ["SURFBOARD_API_URL"]
 
 def charge(minor_units: int, terminal_id: str):
     amount = {"regular": minor_units, "total": minor_units, "currency": "752"}

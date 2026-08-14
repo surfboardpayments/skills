@@ -35,7 +35,7 @@ payment on your own page.
 ## Stage 1: tokenise on the first payment
 
 ```
-POST {SURFBOARD_API_URL}/merchants/:merchantId/orders
+POST {SURFBOARD_API_URL}/orders
 ```
 
 ```json
@@ -56,6 +56,15 @@ POST {SURFBOARD_API_URL}/merchants/:merchantId/orders
   }
 }
 ```
+
+Three things the examples hide, because every documented example uses `quantity: 1`:
+
+- **`amount.total` is the price of one unit**, not the line, despite the wording in
+  the guides. The order total is `sum(total * quantity)`.
+- **`amount.tax` is required on every line**, including zero-VAT lines. Omitting it
+  returns `P_0001 ... reading 'vatValue'`.
+- **Prices include tax.** `totalOrderAmount.total` must equal `regular`. Never add tax
+  on top. See `surfboard-payments`.
 
 `enforceTokenization: true` is what makes the card reusable. Without it stage 2 has
 nothing to charge, and you will not find out until the first renewal.

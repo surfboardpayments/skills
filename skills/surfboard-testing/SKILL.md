@@ -15,9 +15,18 @@ Demo credentials come from the Developer Portal on signup, with no approval step
 
 | | Demo |
 |---|---|
-| Terminals | Payment page mode only |
 | Cards | Test cards |
 | A real card, used by accident | Voided automatically after 30 minutes. Never captured, never settled. |
+| Online terminals | PaymentPage and MerchantInitiated, pre-provisioned on an online store |
+| Physical and SoftPOS terminals | Can be registered and driven. They report real states and accept payment initiation. |
+
+Demo covers more than payment page mode: a registered terminal reports `ACTIVE`,
+accepts payment initiation, and returns real terminal states. This is worth knowing,
+because Demo is where the whole class of order-shape errors below actually surfaces,
+and stopping short of it is how they reach production.
+
+What Demo will not do is complete a SoftPOS payment without the device-side app
+switch. See `surfboard-in-store`.
 
 Demo covers orders, payments, status, webhooks, refunds, captures, and voids. It does
 not cover physical terminal hardware beyond payment page mode.
@@ -43,7 +52,10 @@ working integration you have not observed.
 Poll with backoff and a hard timeout. A payment that never reaches a terminal state is
 an outcome to surface, not a condition to retry forever.
 
-Check `status` in the envelope. A 200 with `"status": "ERROR"` is a failure.
+Check `status` in the envelope. **Errors arrive with a 2xx, and on order creation it
+is usually 201.** A client that special-cases 200 and otherwise trusts the HTTP code
+will read a 201 as success and then push that 201 into its own error path. Read the
+envelope first; map any 2xx-carrying-an-error onto a server-side failure of your own.
 
 ## Post-payment operations
 
@@ -68,6 +80,11 @@ Order creation has its own families: `OR_*`, `PS_*`, `GC_*`, `SP_*`. Look the co
 in `references/guides/create-order-error-codes.md` rather than inferring from
 `message`, because the wording is not a contract.
 
+**`P_*` is the exception, and in practice it is what you will hit most.** Validation
+failures come back as `P_0001: Input data validation failed.` followed by a free-text
+reason, and the prefix is not in the reference. For `P_0001` the message *is* the only
+discriminator, so read it. The common ones are in the table above.
+
 | HTTP | Meaning |
 |---|---|
 | 400 | Malformed body or a missing required field |
@@ -85,6 +102,11 @@ in `references/guides/create-order-error-codes.md` rather than inferring from
 | ORM or template error on order creation | `terminal$id`, where the `$` needs quoting |
 | Reports missing rows | Pagination loop terminated on a short page |
 | Everything 401 after it worked yesterday | Base URL and credentials from different environments |
+| 404 on order creation, merchant ID looks right | Path is merchant-scoped. Orders are not: `POST /orders`, merchant in the header |
+| `P_0001 ... Invalid item price for item id` | `amount.total` is per unit, not per line |
+| `P_0001 ... Invalid total order price` | Tax added on top. `totalOrderAmount.total` must equal `regular` |
+| `P_0001 ... reading 'vatValue'` | A line is missing its required `amount.tax` array |
+| Payment fails within seconds, no card prompt ever appeared | SoftPOS terminal driven from a server, with no device-side app switch |
 | Duplicate fulfilment | Webhook handler not idempotent |
 | Registration fails on a terminal that exists | `PaymentPage`/`MerchantInitiated` are pre-provisioned |
 

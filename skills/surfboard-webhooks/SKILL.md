@@ -44,8 +44,18 @@ processed. Do not infer it from your own state.
 like a failed handler and triggers a retry, which is how one payment becomes three
 fulfilment emails.
 
-**4. Do not assume ordering.** Events can arrive out of order. Reconcile against the
-payment's actual status rather than assuming the sequence you expected.
+**4. Terminal states are final. Guard the write, not just the handler.** Events can
+arrive out of order, and the consequence is specific: once a payment reaches
+`PAYMENT_COMPLETED`, `PAYMENT_FAILED`, or `PAYMENT_CANCELLED`, a later non-terminal
+event must never overwrite it.
+
+Idempotency on event ID does not save you here. Each event is distinct and legitimate;
+a late `order.payment.initiated` arriving after completion is not a duplicate, and a
+handler that is perfectly idempotent will still walk a completed payment backwards.
+That is silent payment-state corruption, and nothing downstream will flag it.
+
+Reconcile against the payment's actual status, and refuse the write at the point of
+the write.
 
 ## Handler skeleton
 

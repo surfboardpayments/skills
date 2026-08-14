@@ -27,11 +27,19 @@ Then have them put the values in `.env` themselves. Do not ask them to paste
 credentials into the chat, and do not read them back:
 
 ```
-SURFBOARD_API_URL=
+SURFBOARD_API_URL=          # from the console; differs between Demo and Live
 SURFBOARD_API_KEY=
 SURFBOARD_API_SECRET=
 SURFBOARD_MERCHANT_ID=
+SURFBOARD_TERMINAL_ID=      # every in-store or checkout integration needs one
+SURFBOARD_PARTNER_ID=       # partner-scoped endpoints only: stores, onboarding,
+                            # billing, logistics, branding, client auth tokens
 ```
+
+If you write a `.env.example` as a template, **leave every value empty and keep it
+that way.** It is tracked. Real values go only in `.env`. Say out loud that you have
+created it, because the common accident is the user pasting keys from the console
+into whichever file is open, and that file is usually the template.
 
 The base URL is shown in the console alongside the keys and differs between Demo and
 Live. It is not published in the documentation, so read it from configuration. Never
@@ -57,6 +65,13 @@ in-store; an e-commerce checkout is online; a subscription product is server-to-
 | To move from Demo to Live | `surfboard-go-live` |
 
 Load one. Do not load all of them, because they overlap deliberately so that each stands alone.
+
+**For anything in-store, settle the hardware question before you write code.**
+`GET /terminals/:terminalId` and read `terminalType`. A `checkoutX` terminal is
+SoftPOS: payments need a native app switch from a point-of-sale app running on the
+same device, and no server-only integration can complete one. A browser-based POS
+talking to a SoftPOS terminal will create real orders and never take a payment. See
+`surfboard-in-store`.
 
 ## Conventions that break integrations
 
@@ -85,6 +100,45 @@ Every response is the same envelope:
 
 `status` is `SUCCESS` or `ERROR`. Branch on that. Log `message`, but never branch on its
 wording, which is not a contract. `data` is absent or null on errors.
+
+**The failure carries a 2xx, and on order creation it is usually 201.** Not 200, not
+4xx. A client that special-cases 200 and otherwise trusts the HTTP code will treat a
+201 as success and then propagate that 201 into its own error path. Read the envelope
+first, and map any 2xx-carrying-an-error onto a server-side failure of your own.
+
+### Orders, payments, and receipts are not merchant-scoped
+
+The merchant travels in the `MERCHANT-ID` **header**, never in the path.
+
+```
+POST   /orders                      correct
+GET    /orders/:orderId/status      correct
+POST   /merchants/:merchantId/orders   404, and the 404 does not say why
+```
+
+Only partner-level endpoints put an ID in the path, and they use `partnerId`:
+stores, merchant onboarding, billing plans, logistics, branding, client auth tokens.
+45 of the 157 endpoints are partner-scoped; none of them are orders, payments, or
+receipts.
+
+> Several long-form guides still show `POST /merchants/:merchantId/orders`. They are
+> wrong. `api/ai/docs.json` is the authoritative index, and it says `/orders`.
+
+### Prices are tax-inclusive
+
+`totalOrderAmount.total` must **equal** `regular`. The `tax` array describes the VAT
+*contained within* that price; it is never added on top.
+
+```json
+"totalOrderAmount": { "regular": 11576, "total": 11576, "currency": "752",
+                      "tax": [{ "amount": 577, "percentage": 5.25, "type": "VAT" }] }
+```
+
+Sending `total = regular + tax` is rejected with `P_0001 ... Invalid total order price`.
+If the system you are integrating quotes prices net of tax, as most US point-of-sale
+systems do, **gross each unit up before building the order.** That is a real
+transformation, not a field rename, and it is the kind of error that passes every
+local test.
 
 ### `terminal$id` contains a dollar sign
 

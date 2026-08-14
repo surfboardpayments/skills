@@ -1,6 +1,6 @@
 # surfboard-payments: bundled guides
 
-Generated from https://www.surfboardpayments.com/api/ai/guides.json (44 guides, updated 2026-08-13).
+Generated from https://www.surfboardpayments.com/api/ai/guides.json (45 guides, updated 2026-08-14).
 Do not edit these by hand; edit the guide on the marketing site and re-run `npm run skills`.
 
 - [API Conventions](./api-conventions.md): The rules that hold across every Surfboard endpoint: authentication, the response envelope, amounts and currencies, identifiers, dates, pagination and environments.

@@ -34,7 +34,7 @@ Create the order against the `PaymentPage` terminal, then redirect the customer 
 URL that comes back.
 
 ```
-POST {SURFBOARD_API_URL}/merchants/:merchantId/orders
+POST {SURFBOARD_API_URL}/orders
 ```
 
 ```json
@@ -56,6 +56,16 @@ POST {SURFBOARD_API_URL}/merchants/:merchantId/orders
 ```
 
 Amounts are minor units. Currency is `"752"`, not `"SEK"`.
+
+Three things the examples hide, because every documented example uses `quantity: 1`:
+
+- **`amount.total` is the price of one unit**, not the line, despite the wording in
+  the guides. The order total is `sum(total * quantity)`.
+- **`amount.tax` is required on every line**, including zero-VAT lines. Omitting it
+  returns `P_0001 ... reading 'vatValue'`.
+- **Prices include tax.** `totalOrderAmount.total` must equal `regular`. Never add tax
+  on top. See `surfboard-payments`.
+
 
 Keep `orderId` against your own order record **before** redirecting. The customer may
 close the tab, and the return URL is not a reliable delivery mechanism.

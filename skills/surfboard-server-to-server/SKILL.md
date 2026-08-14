@@ -59,8 +59,8 @@ POST {SURFBOARD_API_URL}/orders
 
 Three things the examples hide, because every documented example uses `quantity: 1`:
 
-- **`amount.total` is the price of one unit**, not the line, despite the wording in
-  the guides. The order total is `sum(total * quantity)`.
+- **`amount.total` is the price of one unit**, not the line. The order total is
+  `sum(total * quantity)`.
 - **`amount.tax` is required on every line**, including zero-VAT lines. Omitting it
   returns `P_0001 ... reading 'vatValue'`.
 - **Prices include tax.** `totalOrderAmount.total` must equal `regular`. Never add tax

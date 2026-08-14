@@ -121,8 +121,9 @@ stores, merchant onboarding, billing plans, logistics, branding, client auth tok
 45 of the 157 endpoints are partner-scoped; none of them are orders, payments, or
 receipts.
 
-> Several long-form guides still show `POST /merchants/:merchantId/orders`. They are
-> wrong. `api/ai/docs.json` is the authoritative index, and it says `/orders`.
+If you are reading an older copy of a guide that shows
+`POST /merchants/:merchantId/orders`, ignore it. `api/ai/docs.json` is the
+authoritative index and it says `/orders`.
 
 ### Prices are tax-inclusive
 

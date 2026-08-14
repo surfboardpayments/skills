@@ -57,7 +57,7 @@ POST /payments/:paymentId/void
 Confirm the void was applied:
 
 ```json
-GET /merchants/:merchantId/orders/:orderId/status
+GET /orders/:orderId/status
 ```
 
 The order's transaction data will show `voided: true` for the affected transaction.

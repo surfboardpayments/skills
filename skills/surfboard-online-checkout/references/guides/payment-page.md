@@ -42,7 +42,7 @@ Create an order using the [Create Order API](https://developers.surfboardpayment
 For the store, domain and terminal setup this call assumes, see [Online Payment Link](/developers/guides/online-payment-link).
 
 ```json
-POST /merchants/:merchantId/orders
+POST /orders
 {
   "terminal$id": "YOUR_TERMINAL_ID",
   "orderLines": [

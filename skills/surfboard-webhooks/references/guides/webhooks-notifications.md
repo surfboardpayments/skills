@@ -192,7 +192,7 @@ In addition to Console webhooks, you can set a per-order callback URL when creat
 Set `controlFunctions.callBackUrl` in the [Create Order API](https://developers.surfboardpayments.com/api/orders) request:
 
 ```json
-POST /merchants/:merchantId/orders
+POST /orders
 {
   "terminal$id": "YOUR_TERMINAL_ID",
   "orderLines": [ ... ],
@@ -383,4 +383,4 @@ func generateHMACSignature(certificate, message string) string {
 
 | Action | Method | Endpoint |
 |--------|--------|----------|
-| Set per-order webhook | POST | `/merchants/:merchantId/orders` (via `controlFunctions.callBackUrl`) |
+| Set per-order webhook | POST | `/orders` (via `controlFunctions.callBackUrl`) |

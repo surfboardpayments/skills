@@ -36,8 +36,27 @@ Error code prefixes indicate the source:
 | `PS_` | Payment service (payment initiation, refund handling) |
 | `GC_` | Gift card service |
 | `SP_` | Service provider |
+| `P_` | Platform-level validation, ahead of the services above |
 
 Messages may contain placeholders like `<id>`, `<amount>`, `<type>`, or `<status>` -- the API substitutes the real value at runtime.
+
+### `P_0001`, where the message is the code
+
+Payload validation that fails before the order reaches the Orders service comes back as `P_0001`, with the specific reason in free text:
+
+```
+P_0001: Input data validation failed. <reason>
+```
+
+`P_0001` is the only code in this reference where looking the code up tells you nothing. There is one code covering many faults, so **the message is the discriminator**. The three seen most often on a first integration:
+
+| Message fragment | Cause | Fix |
+|---|---|---|
+| `Invalid item price for item id <id>` | `amount.total` sent as the line total | `total` is the **unit** price. See [Create an Order](/developers/guides/create-an-order) |
+| `Invalid total order price` | Tax added on top of the price | Prices are tax-inclusive; `total` must equal `regular`. See [API Conventions](/developers/guides/api-conventions) |
+| `Cannot read properties of undefined (reading 'vatValue')` | A line is missing `amount.tax` | Send a `tax` entry on every line, including zero-rated ones |
+
+The same underlying faults are also described by `OR_0023` and `OR_0037` below, which is what you get when the order reaches the Orders service before failing. Either code can carry the same message.
 
 ## Create Order Errors
 
@@ -57,7 +76,7 @@ Errors thrown while validating and creating the order.
 
 | Code | Message | Notes |
 |------|---------|-------|
-| `PS_0059` | No Merchant found with the given Merchant ID | Merchant ID in the URL does not exist. |
+| `PS_0059` | No Merchant found with the given Merchant ID | The `MERCHANT-ID` header does not match a merchant. Order endpoints are not merchant-scoped in the path -- the merchant travels in the header. |
 | `OR_0001` | No Merchant Details found for the Merchant ID | Merchant exists but is missing required configuration. |
 | `OR_0002` | Order creation is not allowed for this merchant type `<type>` | The merchant type does not permit direct order creation. |
 | `OR_0028` | Store is not in an active state | Activate the store before creating orders. |

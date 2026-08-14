@@ -161,7 +161,7 @@ POST /merchants/:merchantId/stores/:storeId/online-terminals
 Now the familiar call. The `terminal$id` is the `PaymentPage` terminal from step 3, and the response carries the link.
 
 ```json
-POST /merchants/:merchantId/orders
+POST /orders
 {
   "terminal$id": "813ca2cb12ce400405",
   "referenceId": "order-2026-0418",
@@ -296,7 +296,7 @@ The first payment is a customer-initiated transaction on the page, which is wher
 The redirect back to your site tells you the customer finished, not that the money moved. Confirm server-side, either by polling or, better, by subscribing to the webhook.
 
 ```
-GET /merchants/:merchantId/orders/:orderId/status
+GET /orders/:orderId/status
 ```
 
 ```json

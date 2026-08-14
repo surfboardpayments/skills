@@ -24,6 +24,10 @@ API-SECRET:   YOUR_API_SECRET
 MERCHANT-ID:  YOUR_MERCHANT_ID
 ```
 
+**The merchant is a header, not a path segment.** Order, payment, and receipt endpoints are `/orders`, `/payments`, and `/receipts` — there is no `/merchants/{merchantId}/orders`. That path returns a bare `404 Not Found` with no hint about its shape, so it reads as a bad merchant ID rather than a bad URL. If a create-order call 404s, check the path before you check the ID.
+
+Configuration endpoints — stores, terminals, tips, notifications, payment methods — *are* merchant-scoped and do carry `:merchantId` in the path.
+
 Partner-level endpoints — onboarding a merchant, logistics, billing plans — carry the `partnerId` in the path and often do not need `MERCHANT-ID` at all. Where it is optional and you send it anyway, it must match the `:merchantId` in the path.
 
 Three other schemes exist for cases where a long-lived secret cannot travel:
@@ -87,6 +91,21 @@ Order creation adds its own codes in the `OR_*`, `PS_*`, `GC_*` and `SP_*` famil
 }
 ```
 
+**Prices are tax-inclusive.** Every amount you send is gross: the tax is already inside it. The `tax` array reports how much VAT is *contained within* the price, and never an amount to add on top. That is why `regular` and `total` match in the example above -- it is the rule, not a coincidence of round numbers.
+
+```json
+"totalOrderAmount": {
+  "regular": 10999,
+  "total": 10999,
+  "currency": "752",
+  "tax": [{ "amount": 2200, "percentage": 25, "type": "VAT" }]
+}
+```
+
+`totalOrderAmount.total` must equal `regular` plus shipping, minus campaign discounts and adjustments. Adding tax on top so that `total` exceeds `regular` returns `P_0001: Invalid total order price`.
+
+If you are coming from a sales-tax market, this is a real transformation rather than a field rename. A system that stores net prices and computes tax at checkout has to gross each unit up before building the order, and round per unit rather than on the order total. It is worth checking early: net prices pass every local test and fail on the first call to the API.
+
 Countries, by contrast, are two-letter ISO 3166-1 alpha-2 codes in uppercase — `"SE"`, `"NO"` — and phone numbers split into a dialling code without the plus and a national number:
 
 ```json
@@ -147,6 +166,23 @@ So the loop terminates on an empty `data`, or on having seen `x-total-items` row
 | **Live** | All terminal types | Real cards, settled, paid out |
 
 Demo credentials come from the Developer Portal as soon as you sign up. Live credentials are issued separately, after Surfboard certifies the integration, and the base URL changes with them — so keep the host, the key and the secret in configuration rather than in code.
+
+**Where the base URL comes from.** It is issued to you rather than published here, and it is not the same string for every account, so there is no host to copy out of this guide. Find it in the Developer Portal console, shown next to the keys it belongs with:
+
+```
+https://developers.surfboardpayments.com/console/api-keys
+```
+
+Read it from configuration — the `YOUR_API_URL` placeholder in the examples below stands for exactly this value, and the conventional environment variable is `SURFBOARD_API_URL`:
+
+```
+SURFBOARD_API_URL=
+SURFBOARD_API_KEY=
+SURFBOARD_API_SECRET=
+SURFBOARD_MERCHANT_ID=
+```
+
+If you are an agent building this integration, this is the one value you cannot derive or discover: ask the user to copy it from the console, and never guess a host or reuse one from an example.
 
 > A real card used in the demo environment is voided automatically after 30 minutes. It is never captured and never settles.
 

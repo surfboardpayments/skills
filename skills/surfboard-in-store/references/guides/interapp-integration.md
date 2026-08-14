@@ -173,7 +173,7 @@ Once the terminal is registered, process payments through app switch.
 Create an order using the [Create Order API](/developers/guides/create-an-order) with the `terminalId` from registration. The response includes a `paymentId` and an `interAppJWT`:
 
 ```json
-POST /merchants/:merchantId/orders
+POST /orders
 {
   "terminal$id": "YOUR_TERMINAL_ID",
   "orderLines": [
@@ -255,7 +255,7 @@ if (await canLaunchUrl(uri)) {
 CheckoutX calls your redirect URL with the result. Check the order status via API to confirm payment completion:
 
 ```json
-GET /merchants/:merchantId/orders/:orderId/status
+GET /orders/:orderId/status
 ```
 
 ## Framing the Redirect URL

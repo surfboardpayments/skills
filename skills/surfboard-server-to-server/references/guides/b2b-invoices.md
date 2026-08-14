@@ -111,7 +111,7 @@ This is the buyer's registered billing address, which is not necessarily where t
 The call is Create Order with the invoice configuration carried in `controlFunctions.initiatePaymentsOptions.paymentMethodParams.invoice`:
 
 ```json
-POST /merchants/:merchantId/orders
+POST /orders
 {
   "terminal$id": "813ca2cb12ce400405",
   "referenceId": "order-2026-0418",
@@ -230,7 +230,7 @@ If you initiate the payment separately rather than inside Create Order, the same
 Order status works the same as for any other order:
 
 ```
-GET /merchants/:merchantId/orders/:orderId/status
+GET /orders/:orderId/status
 ```
 
 Subscribe to `order.paymentcompleted` and `order.paymentfailed` rather than polling on a timer — see [Webhooks](/developers/guides/webhooks-notifications) for subscriptions, retries and signature verification.
@@ -273,7 +273,7 @@ That is the whole operation. Use it for the ordinary cases — wrong amount, wro
 Once the buyer has settled, crediting is a refund and takes the standard return-order shape: a new order with negative quantities, each line pointing back at the order and the payment it credits.
 
 ```json
-POST /merchants/:merchantId/orders
+POST /orders
 {
   "terminal$id": "813ca2cb12ce400405",
   "referenceId": "credit-2026-0418",

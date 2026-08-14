@@ -28,7 +28,7 @@ A partial refund returns a portion of the order amount to the customer. Like a f
 Include only the line items being refunded, with negative `quantity` and negative `amount.total`. Reference the original order's `orderId` as `purchaseOrderId`:
 
 ```json
-POST /merchants/:merchantId/orders
+POST /orders
 {
   "terminal$id": "YOUR_TERMINAL_ID",
   "referenceId": "partial-refund-001",
@@ -158,7 +158,7 @@ When using `OTHER`, include the explanation:
 Verify the partial refund completed:
 
 ```json
-GET /merchants/:merchantId/orders/:orderId/status
+GET /orders/:orderId/status
 ```
 
 Track refund status via the API response or through [webhooks](/developers/guides/webhooks-notifications).

@@ -41,7 +41,7 @@ The window between steps 3 and 5 is where your business logic lives, and it is s
 Nothing changes here. Create the order the way you always do, with the line items you have at the point of sale.
 
 ```json
-POST /merchants/:merchantId/orders
+POST /orders
 {
   "terminal$id": "8386af3b0f71b80b04",
   "referenceId": "till-2-0418",
@@ -174,7 +174,7 @@ Recalculate `totalOrderAmount` to match. A total that does not reconcile with it
 ## Step 5: Initiate the Payment
 
 ```json
-POST /merchants/:merchantId/payments
+POST /payments
 {
   "orderId": "832cf9f93d2fd0410b",
   "paymentMethod": "CARD",

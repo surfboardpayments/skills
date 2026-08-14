@@ -53,7 +53,7 @@ If the payment already completed before your cancel request was processed, the s
 Confirm the order reflects the cancellation:
 
 ```json
-GET /merchants/:merchantId/orders/:orderId/status
+GET /orders/:orderId/status
 ```
 
 ```json

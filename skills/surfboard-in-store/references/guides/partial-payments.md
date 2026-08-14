@@ -28,7 +28,7 @@ Partial payments let you split a single order across multiple payment transactio
 Create an order and specify a partial `amount` in `initiatePaymentsOptions`. This initiates the first payment for less than the total:
 
 ```json
-POST /merchants/:merchantId/orders
+POST /orders
 {
   "terminal$id": "YOUR_TERMINAL_ID",
   "referenceId": "split-order-001",
@@ -96,7 +96,7 @@ The order total is 100,000 but only 50,000 is charged in this first payment. The
 Use the Initiate Payment API to pay the remaining balance. Specify the `orderId` from the first step:
 
 ```json
-POST /merchants/:merchantId/payments
+POST /payments
 {
   "orderId": "83d5ec67aab053970b",
   "paymentMethod": "CARD",
@@ -124,7 +124,7 @@ You can split across more than two payments -- keep initiating payments until th
 Verify the order is fully paid:
 
 ```json
-GET /merchants/:merchantId/orders/:orderId/status
+GET /orders/:orderId/status
 ```
 
 ```json

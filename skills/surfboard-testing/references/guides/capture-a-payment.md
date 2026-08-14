@@ -30,7 +30,7 @@ This guide walks through the full capture flow: create an authorized order, capt
 Create an order with `delayCapture: true` in `controlFunctions`:
 
 ```json
-POST /merchants/:merchantId/orders
+POST /orders
 {
   "terminal$id": "YOUR_TERMINAL_ID",
   "orderLines": [

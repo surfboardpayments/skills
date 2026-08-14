@@ -36,7 +36,7 @@ Both `PaymentPage` and `MerchantInitiated` terminals are provisioned when the on
 The first order collects card details and sets up the recurring agreement. Use `enforceTokenization` together with the `recurring` configuration and set `subscription` to `true`:
 
 ```json
-POST /merchants/:merchantId/orders
+POST /orders
 {
   "terminal$id": "YOUR_PAYMENT_PAGE_TERMINAL_ID",
   "orderLines": [
@@ -78,7 +78,7 @@ The customer completes this payment on the payment page. Once the payment succee
 After the initial payment completes, fetch the token:
 
 ```
-GET /merchants/:merchantId/orders/:orderId/tokens
+GET /orders/:orderId/tokens
 ```
 
 Store the returned `tokenId` securely on your backend, associated with the customer record. This token is used for all future recurring charges.
@@ -122,7 +122,7 @@ When a billing cycle is due, create an order on the MerchantInitiated terminal a
 ### Create the recurring order
 
 ```json
-POST /merchants/:merchantId/orders
+POST /orders
 {
   "terminal$id": "YOUR_MIT_TERMINAL_ID",
   "referenceId": "sub-cust42-2026-02",
@@ -144,7 +144,7 @@ POST /merchants/:merchantId/orders
 ### Initiate payment with the token
 
 ```json
-POST /merchants/:merchantId/payments
+POST /payments
 {
   "orderId": "ORDER_ID_FROM_ABOVE",
   "paymentMethod": "CTOKEN",
@@ -155,7 +155,7 @@ POST /merchants/:merchantId/payments
 ### Verify the result
 
 ```
-GET /merchants/:merchantId/orders/:orderId/status
+GET /orders/:orderId/status
 ```
 
 A successful charge returns `orderStatus: "PAYMENT_COMPLETED"`.

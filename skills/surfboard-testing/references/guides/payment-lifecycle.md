@@ -18,12 +18,12 @@ Every payment follows a lifecycle: create an order, authorize payment, capture f
 
 | Operation | When to Use | Endpoint | Method |
 |-----------|-------------|----------|--------|
-| **Create Order** | Start a new payment | `/merchants/:merchantId/orders` | POST |
+| **Create Order** | Start a new payment | `/orders` | POST |
 | **Capture** | Finalize a delayed-capture auth | `/payments/:paymentId/capture` | POST |
 | **Void** | Reverse before settlement | `/payments/:paymentId/void` | POST |
 | **Cancel** | Stop before completion | `/payments/:paymentId` | DELETE |
-| **Refund** | Full return after settlement | `/merchants/:merchantId/orders` | POST |
-| **Partial Refund** | Partial return after settlement | `/merchants/:merchantId/orders` | POST |
+| **Refund** | Full return after settlement | `/orders` | POST |
+| **Partial Refund** | Partial return after settlement | `/orders` | POST |
 
 ## Order and Payment Statuses
 
@@ -74,7 +74,7 @@ Every payment ends in one of three terminal states. Once a payment reaches a ter
 Every payment starts with an order containing line items and a terminal ID.
 
 ```json
-POST /merchants/:merchantId/orders
+POST /orders
 {
   "terminal$id": "YOUR_TERMINAL_ID",
   "orderLines": [{
@@ -165,7 +165,7 @@ DELETE /payments/:paymentId
 A full refund is a **new order** with negative quantities and the original `orderId` as `purchaseOrderId` on each line item.
 
 ```json
-POST /merchants/:merchantId/orders
+POST /orders
 {
   "terminal$id": "YOUR_TERMINAL_ID",
   "orderLines": [{
@@ -197,7 +197,7 @@ Key details:
 Works the same as a full refund, but only include the specific items or reduced quantities you want to return.
 
 ```json
-POST /merchants/:merchantId/orders
+POST /orders
 {
   "terminal$id": "YOUR_TERMINAL_ID",
   "orderLines": [{
@@ -223,7 +223,7 @@ POST /merchants/:merchantId/orders
 Query the current state of any order at any point:
 
 ```json
-GET /merchants/:merchantId/orders/:orderId/status
+GET /orders/:orderId/status
 ```
 
 ```json

@@ -98,13 +98,13 @@ captures, and voids.
 Every example in the documentation uses `quantity: 1`, so none of these surface until
 you build a real cart.
 
-**`total` is the price of one unit, not the line.** Despite being documented as "total
-line amount", it must equal `regular + shipping - campaign` for a single unit. The
-order total is `sum(total * quantity)`. Sending `4500 * 2 = 9000` on a line of
-quantity 2 is rejected with `P_0001 ... Invalid item price for item id`.
+**`total` is the price of one unit, not the line.** It must equal
+`regular + shipping - campaign` for a single unit; the order total is
+`sum(total * quantity)`. Sending `4500 * 2 = 9000` on a line of quantity 2 is
+rejected with `P_0001 ... Invalid item price for item id`.
 
 **`amount.tax` is required on every line**, including zero-VAT lines, where you still
-send a `0` percentage entry. It is documented as optional. Omitting it returns
+send a `0` percentage entry. Omitting it returns
 `P_0001 ... Cannot read properties of undefined (reading 'vatValue')`, which is an
 internal null dereference leaking out as a validation message. If you see `vatValue`,
 a line is missing its tax array.

@@ -79,7 +79,7 @@ POST /merchants/:merchantId/stores/:storeId/devices
 Create orders and initiate payments using the [Orders API](https://developers.surfboardpayments.com/api/orders). The Carbon API uses an orders-first workflow -- create an order and initiate payment in a single call:
 
 ```json
-POST /merchants/:merchantId/orders
+POST /orders
 {
   "terminal$id": "YOUR_TERMINAL_ID",
   "orderLines": [

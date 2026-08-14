@@ -27,7 +27,7 @@ That is what makes the rest possible: subscription renewals, one-click repeat pu
 Set `enforceTokenization` when you create the order. On an online order it belongs inside `controlFunctions.online`:
 
 ```json
-POST /merchants/:merchantId/orders
+POST /orders
 {
   "terminal$id": "YOUR_TERMINAL_ID",
   "orderLines": [
@@ -109,7 +109,7 @@ Store it where you would store an account identifier: your primary datastore, en
 Pass it into a payment through `paymentMethodParams`:
 
 ```json
-POST /merchants/:merchantId/payments
+POST /payments
 {
   "orderId": "83a1ba32774149710b",
   "paymentMethod": "CARD",

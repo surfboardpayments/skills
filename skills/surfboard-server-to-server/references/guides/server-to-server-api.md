@@ -35,7 +35,7 @@ The first payment must be initiated by the customer. This step collects and toke
 Use the [Create Order API](https://developers.surfboardpayments.com/api/orders) with `enforceTokenization` set to `true`:
 
 ```json
-POST /merchants/:merchantId/orders
+POST /orders
 {
   "terminal$id": "YOUR_PAYMENT_PAGE_TERMINAL_ID",
   "orderLines": [
@@ -68,7 +68,7 @@ The customer enters their card details on the payment page or your self-hosted c
 After the payment completes, call the [Fetch Tokens from Orders API](https://developers.surfboardpayments.com/api/orders) to retrieve the `tokenId` and card information:
 
 ```json
-GET /merchants/:merchantId/orders/:orderId/tokens
+GET /orders/:orderId/tokens
 ```
 
 Store the `tokenId` securely against the customer in your system. You will use it for all future charges.
@@ -84,7 +84,7 @@ With the `tokenId` stored, you can now charge the customer from your backend at 
 Create a new order using the **MerchantInitiated** terminal:
 
 ```json
-POST /merchants/:merchantId/orders
+POST /orders
 {
   "terminal$id": "YOUR_MIT_TERMINAL_ID",
   "orderLines": [
@@ -123,7 +123,7 @@ curl -X POST YOUR_API_URL/payments \
 Verify the payment result using the [Fetch Order Status API](https://developers.surfboardpayments.com/api/orders):
 
 ```json
-GET /merchants/:merchantId/orders/:orderId/status
+GET /orders/:orderId/status
 ```
 
 The status will be `PAYMENT_COMPLETED` on success or `PAYMENT_CANCELLED` / `PAYMENT_FAILED` otherwise. You can also receive real-time updates via webhooks.

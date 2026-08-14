@@ -30,7 +30,7 @@ A full refund in Surfboard is processed by creating a **new order** with negativ
 Create a new order with negative `quantity` and negative `amount.total` for each line item. Include the original `orderId` as `purchaseOrderId`:
 
 ```json
-POST /merchants/:merchantId/orders
+POST /orders
 {
   "terminal$id": "YOUR_TERMINAL_ID",
   "referenceId": "refund-order-001",
@@ -181,7 +181,7 @@ When using `OTHER`, include the explanation:
 Verify the refund completed:
 
 ```json
-GET /merchants/:merchantId/orders/:orderId/status
+GET /orders/:orderId/status
 ```
 
 The order status will show `PAYMENT_COMPLETED` once the refund is processed. You can also track refund status via [webhooks](/developers/guides/webhooks-notifications).

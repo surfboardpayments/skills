@@ -1,6 +1,6 @@
 ---
 name: surfboard-payments
-description: Router and shared conventions for integrating Surfboard Payments: in-store card terminals, Tap to Pay, hosted online checkout, recurring billing, and merchant onboarding. Use whenever the task mentions Surfboard, surfpay, SurfTouch, SurfPad, SurfPrint, SurfMini, CheckoutX, or asks to add card payments, a payment terminal, or a checkout to a codebase. Start here before any other surfboard-* skill.
+description: "Router and shared conventions for integrating Surfboard Payments: in-store card terminals, Tap to Pay, hosted online checkout, recurring billing, and merchant onboarding. Use whenever the task mentions Surfboard, surfpay, SurfTouch, SurfPad, SurfPrint, SurfMini, CheckoutX, or asks to add card payments, a payment terminal, or a checkout to a codebase. Start here before any other surfboard-* skill."
 ---
 
 # Surfboard Payments

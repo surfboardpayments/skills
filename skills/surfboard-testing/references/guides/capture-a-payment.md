@@ -79,6 +79,27 @@ POST /orders
 
 Store the `paymentId` -- you need it to capture.
 
+### Webhooks at Authorization
+
+When the customer pays, you receive `order.paymentinitiated`, sometimes `order.paymentprocessed`, and then `order.paymentcompleted`. For a delayed-capture order, `order.paymentcompleted` means the payment is **authorized**, not captured. No webhook is sent when the payment is later captured, so use the capture status call in [Step 3](#step-3-check-capture-status) to follow the capture.
+
+### Payment Methods
+
+`delayCapture` is accepted for every payment method, but not every method can hold funds:
+
+| Payment method | Behavior with `delayCapture` |
+|----------------|------------------------------|
+| **Card** | Authorized at checkout, captured when you call capture |
+| **Apple Pay / Google Pay** | Same as card |
+| **Klarna** | Supports delayed capture and partial capture |
+| **Swish** | No separate authorization step. The payment settles when the customer approves it and the flag has no effect |
+
+### How Long an Authorization Lasts
+
+Surfboard does not limit how long after authorization you can capture. The limit is set by the card scheme and acquirer, typically around **7 days** for cards, so capture well within that window.
+
+Surfboard never captures or voids an authorization automatically. If you neither capture nor [void](/developers/guides/payment-lifecycle#void-a-payment) it, the authorization lapses at the issuer and the funds are released back to the customer. Void authorizations you no longer intend to capture rather than letting them lapse.
+
 ### Pre-Authorization Mode
 
 For flows where the final capture amount may differ from the authorized amount, use `authMode: "PRE-AUTH"`. This automatically enables `delayCapture`:
@@ -123,9 +144,11 @@ POST /payments/:paymentId/capture
 
 > The `amount` field is only valid for `PRE-AUTH` orders. For standard `delayCapture`, send an empty body to capture the full authorized amount.
 
+A `SUCCESS` response means the capture request was accepted and sent on. For cards, captures are processed asynchronously in batches, and the acquirer can still decline the capture afterwards, so a successful response is not yet a completed capture.
+
 ## Step 3: Check Capture Status
 
-Verify the capture completed successfully:
+There is no webhook for a completed or failed capture. Poll the capture status instead, starting about 30 minutes after the capture request:
 
 ```json
 GET /payments/:paymentId/capture
@@ -142,6 +165,10 @@ GET /payments/:paymentId/capture
 ```
 
 **Possible `captureStatus` values:** `PENDING` | `SUCCESS` | `ERROR`
+
+- **`PENDING`** -- the capture has not been processed yet. Check again later.
+- **`ERROR`** -- the capture did not go through. It is safe to send `POST /payments/:paymentId/capture` again for a capture that never completed.
+- If a capture stays `PENDING` well beyond the normal processing time, contact Surfboard support with the `paymentId`.
 
 ## Reference
 

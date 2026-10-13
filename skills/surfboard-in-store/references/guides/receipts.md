@@ -22,11 +22,11 @@ Before working with receipts, make sure you have:
 
 - A Surfboard developer account with valid API credentials (`API-KEY` and `API-SECRET`)
 - At least one completed transaction, payment, or order
-- For printing: a registered Surfboard terminal with printing capability (SurfTouch with dock or SurfPrint)
+- For printing: a registered [terminal with a built-in printer](/products/?requirements=printer) or a [FinPrinter](/products/fins/finprinter)
 
 ## Adding Receipt Information
 
-Use this endpoint to store cash register-specific details against an order. This data is used when generating receipt output and is often required for fiscal compliance in Nordic markets.
+Use this endpoint to store cash register-specific details against an order. This data is used when generating receipt output and is often required for fiscal compliance in Nordic markets. If the register itself runs on Surfboard, see [Build Your Own ECR](/developers/guides/electronic-cash-register) for the full register lifecycle.
 
 ```
 PUT /receipts/{orderId}
@@ -138,10 +138,10 @@ The `{id}` path parameter accepts a Transaction ID, Payment ID, or Order ID.
 
 ## Printing Receipts on a Terminal
 
-Print a receipt directly from a Surfboard terminal that has printing capability. Surfboard supports printing through SurfTouch (which features a dock with a printer for checkout) and SurfPrint (which has a built-in printer for on-floor payments).
+Print a receipt directly on a Surfboard device with a printer: a [terminal with a built-in printer](/products/?requirements=printer), such as SurfPrint Pro, or a [FinPrinter](/products/fins/finprinter), the standalone cloud printer. Surfboard renders the receipt from the template configured in the Partner Portal, so the request carries an ID and a target device, nothing more.
 
 ```
-PUT /receipts/{id}/print
+POST /receipts/{id}/print
 ```
 
 The `{id}` path parameter accepts a Transaction ID, Payment ID, or Order ID.
@@ -150,24 +150,22 @@ The `{id}` path parameter accepts a Transaction ID, Payment ID, or Order ID.
 
 ```json
 {
-  "templateId": "default",
   "terminalId": "trm_abc123",
-  "language": "sv"
+  "templateType": "TRANSACTION_RECEIPT"
 }
 ```
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `templateId` | string | No | Select from Surfboard's default set of receipt templates. |
-| `terminalId` | string | No | Target a specific printing-enabled terminal. If omitted, prints on the terminal that handled the transaction. |
-| `language` | string | No | Receipt language. Available: `sv`, `da`, `fi`, `en`. Defaults to the merchant's configured language. |
+| `terminalId` | string | No | Target a specific printing-enabled device. If omitted, prints on the terminal that handled the transaction. |
+| `templateType` | string | No | `TRANSACTION_RECEIPT` (default) or `SALES_SUMMARY`. |
 
 **Response:**
 
 ```json
 {
   "status": "SUCCESS",
-  "message": "Receipt print command sent successfully"
+  "message": "Receipt sent to the printer successfully."
 }
 ```
 
@@ -177,6 +175,8 @@ The `{id}` path parameter accepts a Transaction ID, Payment ID, or Order ID.
 | `message` | string | Description of the result. |
 
 > **Note:** A `SUCCESS` response means the print command was dispatched to the terminal. The terminal must be online and not processing another command for the receipt to print.
+
+> **Note:** Which template renders is set in the Partner Portal at partner, merchant or store level, and the receipt content comes from the order's `orderLines`. The older `PUT /receipts/{id}/print` form with `templateId` and `language` still works but is superseded. For how templates are set up, how the FinPrinter fits in, and when to choose ESC/POS instead, see [Receipt Printing](/developers/guides/receipt-printing).
 
 ## Custom ESC/POS Printing
 
@@ -246,7 +246,7 @@ ESC/POS is a command protocol originally developed by Epson and now supported by
 | Add receipt information | PUT | `/receipts/{orderId}` |
 | Email a receipt | PUT | `/receipts/{id}/email` |
 | Fetch receipt link | GET | `/receipts/{id}/link` |
-| Print receipt on terminal | PUT | `/receipts/{id}/print` |
+| Print receipt on terminal | POST | `/receipts/{id}/print` |
 | Print custom ESC/POS receipt | PUT | `/receipts/{terminalId}/escpos` |
 
-For full endpoint details, see the [Receipts API](https://developers.surfboardpayments.com/api/receipts) reference documentation.
+For full endpoint details, see the [Receipts API](https://developers.surfboardpayments.com/api/receipts) reference documentation. For a comparison of template printing and ESC/POS, see [Receipt Printing](/developers/guides/receipt-printing).

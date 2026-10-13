@@ -1,12 +1,12 @@
 # surfboard-in-store: bundled guides
 
-Generated from https://www.surfboardpayments.com/api/ai/guides.json (45 guides, updated 2026-08-14).
+Generated from https://www.surfboardpayments.com/api/ai/guides.json (48 guides, updated 2026-10-13).
 Do not edit these by hand; edit the guide on the marketing site and re-run `npm run skills`.
 
 - [Create an Order](./create-an-order.md): Learn how to create orders with line items, tax, customer details, and control functions. The starting point for accepting payments with the Surfboard API.
 - [EMV Terminal Integration](./emv-terminal-integration.md): Integrate traditional card-present terminals through Surfboard's unified API. From account setup to live payments in one guide.
 - [CheckoutX SoftPOS](./checkoutx-softpos.md): Accept in-person payments on smartphones and tablets by pairing the CheckoutX app with your own POS app, a dual-app setup that requires no SDK integration.
-- [Inter-App Integration](./interapp-integration.md): Integrate your POS app with CheckoutX using native app switch. Register terminals, process payments, and scan NFC tags through a bi-directional deep link flow.
+- [Inter-App Integration](./interapp-integration.md): Integrate your POS app with CheckoutX using native app switch. Register terminals, process payments, and scan NFC tags through a bi-directional deep link flow -- from a native app or a browser-based POS.
 - [Customer Identification on Card Tap](./customer-identification.md): Recognise a returning customer from the card they tap, before the payment runs. Apply their discount, points or price list to the open order, then take the money.
 - [Tips Configuration](./tips-configuration.md): Configure tipping on Surfboard payment terminals at the merchant, store, or terminal level using a hierarchical override model.
 - [Receipts](./receipts.md): Generate, email, print, and customise receipts for in-store transactions using the Surfboard Receipts API.

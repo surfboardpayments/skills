@@ -23,7 +23,7 @@ What changes is the timing. A card payment moves money at checkout; an invoice r
 ## Prerequisites
 
 1. A developer account at the [Developer Portal](https://developers.surfboardpayments.com/sign-up)
-2. A merchant that has completed onboarding, with an approved online store — [Online Payment Link](/developers/guides/online-payment-link) covers store creation and domain verification
+2. A merchant that has completed onboarding, with an approved online store — [Payment Page](/developers/guides/payment-page) covers store creation and domain verification
 3. `b2binv` active on the merchant or the store
 4. The `terminalId` of the store's online terminal
 
@@ -359,7 +359,7 @@ Failures come back as `status: "ERROR"` with an `OR_*` or `PS_*` code, and the o
 - [Create an Order](/developers/guides/create-an-order) — line items, tax and control functions in full
 - [Refund an Order](/developers/guides/refund-an-order) — the card-side equivalent of a credit invoice
 - [Settlements & Reporting](/developers/guides/settlements-reporting) — reconciling what has actually been paid
-- [Online Payment Link](/developers/guides/online-payment-link) — the store and terminal setup this guide assumes
+- [Payment Page](/developers/guides/payment-page) — the store and terminal setup this guide assumes
 
 ## Reference
 

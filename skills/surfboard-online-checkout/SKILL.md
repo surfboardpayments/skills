@@ -103,9 +103,10 @@ component, so card data never reaches your server. Uses a per-order nonce in
 ## Payment links
 
 No checkout UI at all: generate a URL, send it to the customer, get notified when it
-is paid. Good for invoicing and remote sales.
+is paid. Good for invoicing and remote sales. The Payment Page guide covers this: the
+order call returns the link, which you can send instead of redirecting.
 
-`references/guides/online-payment-link.md`.
+`references/guides/payment-page.md`.
 
 ## Branding
 

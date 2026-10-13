@@ -2,13 +2,13 @@
 title: "Inter-App Integration"
 source: https://www.surfboardpayments.com/developers/guides/interapp-integration
 category: in-store
-tags: [In-Store, Android, iOS, CheckoutX, App Switch]
+tags: [In-Store, Android, iOS, Web, CheckoutX, App Switch]
 generated: true
 ---
 
 # Inter-App Integration
 
-> Integrate your POS app with CheckoutX using native app switch. Register terminals, process payments, and scan NFC tags through a bi-directional deep link flow.
+> Integrate your POS app with CheckoutX using native app switch. Register terminals, process payments, and scan NFC tags through a bi-directional deep link flow -- from a native app or a browser-based POS.
 
 ## Overview
 
@@ -55,6 +55,10 @@ Register a deep link intent filter in your `AndroidManifest.xml`:
 ### iOS
 
 Register a custom URL scheme in your `Info.plist` or Xcode project settings. Add your scheme (e.g., `posapp`) under **URL Types**.
+
+### Browser-based POS
+
+A web app has no scheme of its own to register. The switch out to CheckoutX works the same way, but the return needs a redirect URL that names the operator's browser -- see [Browser-Based POS (Web Apps)](#browser-based-pos-web-apps).
 
 ## Configure Terminal Before Payment
 
@@ -285,6 +289,105 @@ val encoded = Base64.getUrlEncoder().encodeToString(url.toByteArray())
 let url = "posapp://hello/order?orderRef=6ba7b7db-519f-4ed9-9f6b-a834140466f7"
 let encoded = Data(url.utf8).base64EncodedString()
 ```
+
+```js
+// JavaScript -- URL-safe base64, no padding
+const encoded = btoa(url).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+```
+
+For a browser-based POS the redirect URL names the operator's browser instead of your app -- see [Browser-Based POS (Web Apps)](#browser-based-pos-web-apps).
+
+## Browser-Based POS (Web Apps)
+
+If your POS runs in a browser rather than as an installed app -- a web POS on an Android tablet, for instance -- the switch **out** to CheckoutX works exactly as described above. A `checkoutx://` deep link is just a link, and the browser hands it to CheckoutX.
+
+The difference is the way **back**. A web app has no custom scheme to register, and an `https://` redirect URL does not return the operator to their browser: CheckoutX opens it in its own in-app browser, leaving the POS session behind in a tab nobody is looking at.
+
+### Launching CheckoutX from a page
+
+Build and encode the deep link exactly as elsewhere in this guide, then follow it:
+
+```js
+const deepLink =
+  `checkoutx://com.surfboard.checkoutx/transaction` +
+  `?redirectUrl=${encodedRedirectUrl}&data=${encodedData}`;
+
+// A temporary anchor click is more reliable than assigning window.location,
+// which some in-app browsers and webviews intercept
+const a = document.createElement("a");
+a.href = deepLink;
+a.style.display = "none";
+document.body.appendChild(a);
+a.click();
+setTimeout(() => a.remove(), 100);
+```
+
+### Returning to the browser
+
+Point the redirect URL at the **browser**, not at a page. On Android Chrome:
+
+```
+googlechrome://com.android.chrome
+```
+
+Base64-encode it like any other redirect URL. Chrome comes to the front on the tab the flow started in -- nothing is navigated and nothing reloads, so the POS keeps its state.
+
+If the return has to land on a specific page instead:
+
+```
+googlechrome://navigate?url=<percent-encoded https URL>
+```
+
+This works too, but opens a **new tab** on every return and leaves the original behind. Prefer the first form unless a specific landing URL is essential.
+
+> A `?url=` parameter on the first form is silently dropped -- `com.android.chrome` is a host Chrome ignores rather than a navigate endpoint. There is no same-tab-with-landing-URL variant.
+
+### The return carries no data
+
+Because the redirect names a browser rather than a URL, nothing comes back in it -- no `data` parameter to decode. That is not a limitation to work around: the API is the source of truth for the result in every flow, and a browser POS simply leans on it entirely.
+
+- **Payment:** poll `GET /orders/:orderId/status` until it reaches a terminal state.
+- **Registration:** poll `GET /merchants/:merchantId/stores/:storeId/terminals/interapp/:interappCode` until `registrationStatus` is `REGISTERED`, then store the returned `terminalId`.
+
+Since the tab is never reloaded, becoming visible again is the signal that the operator is back:
+
+```js
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && pendingOrderId) {
+    checkOrderStatus(pendingOrderId); // re-check immediately, then keep polling
+  }
+});
+```
+
+Persist the pending `orderId` (and the registration code) in `localStorage` as well. The tab is not reloaded on the way back with the redirect above, but it can still be evicted while backgrounded, and the `navigate` form reloads by design.
+
+### Other browsers
+
+The mechanism is not Chrome-specific: **any browser that registers a launch scheme can be named in the redirect URL the same way.** Chrome on Android is simply the combination we verified end to end.
+
+| Redirect URL | Behaviour |
+|---|---|
+| `googlechrome://com.android.chrome` | Chrome to the front, original tab, no reload -- verified on an Android tablet |
+| `googlechrome://navigate?url=<encoded>` | Chrome opens the given URL in a new tab -- verified |
+| Another browser's scheme | Same shape, verify per browser |
+
+To check what a given browser answers to on your target device:
+
+```
+adb shell am start -a android.intent.action.VIEW -d "<scheme>://"
+```
+
+If the browser comes to the front, that scheme works as a redirect URL. Confirm on the device and browser your merchants actually use -- schemes differ between browsers and vendors, and some register none at all. Where a browser registers nothing, the flows still complete: polling reports the result, and the operator returns to the browser manually.
+
+### What does not work from a browser
+
+Measured against CheckoutX on Android, so you do not have to retry them:
+
+| Redirect URL | Result |
+|---|---|
+| `intent://…#Intent;package=com.android.chrome;end` | No return at all, with or without `action=` and extras -- the redirect is not parsed as an intent URI |
+| `https://your-pos.example.com/...` | Opens in CheckoutX's in-app browser rather than the operator's browser |
+| An `https://` page that re-launches an `intent://` URI | Ignored as well -- the in-app browser does not follow it |
 
 ## NFC Tag Scanning
 

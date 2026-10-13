@@ -1,6 +1,6 @@
 # surfboard-go-live: bundled guides
 
-Generated from https://www.surfboardpayments.com/api/ai/guides.json (45 guides, updated 2026-08-14).
+Generated from https://www.surfboardpayments.com/api/ai/guides.json (48 guides, updated 2026-10-13).
 Do not edit these by hand; edit the guide on the marketing site and re-run `npm run skills`.
 
 - [EMV Terminal Integration](./emv-terminal-integration.md): Integrate traditional card-present terminals through Surfboard's unified API. From account setup to live payments in one guide.

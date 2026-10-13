@@ -63,7 +63,7 @@ Every payment ends in one of three terminal states. Once a payment reaches a ter
 
 | Payment Status | Order Status | Description |
 |----------------|--------------|-------------|
-| `PAYMENT_COMPLETED` | `PAYMENT_COMPLETED` | Payment succeeded -- funds are captured and the order is closed. |
+| `PAYMENT_COMPLETED` | `PAYMENT_COMPLETED` | Payment succeeded and the order is closed. For a `delayCapture` order this means the payment is authorized; funds are captured only when you [capture the payment](#capture-a-payment). |
 | `PAYMENT_CANCELLED` | `PENDING` | Payment was cancelled -- the order remains open and a new payment can be initiated using the existing `orderId`. |
 | `PAYMENT_FAILED` | `PENDING` | Payment failed -- the order remains open and a new payment can be initiated using the existing `orderId`. |
 
@@ -122,6 +122,8 @@ The `amount` field is only required for `PRE-AUTH` orders where you capture a di
 ```
 
 Check capture status with `GET /payments/:paymentId/capture`. Possible `captureStatus` values: `PENDING`, `SUCCESS`, `ERROR`.
+
+Card captures are processed asynchronously, so a `SUCCESS` response to the capture request does not mean the capture has completed, and no webhook is sent when it does. Poll the capture status instead. See [Capture a Payment](/developers/guides/capture-a-payment) for the full flow, including how long an authorization lasts.
 
 ## Void a Payment
 

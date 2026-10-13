@@ -58,7 +58,7 @@ Three flags decide how hard you insist, and the difference matters when the card
 
 Pick by what breaks if there is no token. A subscription with no token to renew against is worse than a failed first payment, so `errorIfTokenizationFails` is right there. A shop offering "save this card for next time" should not lose the sale over it, so `tokenisationIfPossible` is right there.
 
-For subscriptions, pair tokenization with the `recurring` block so the first payment is authorised as the start of a series rather than a one-off — see [Online Payment Link](/developers/guides/online-payment-link#recurring-orders).
+For subscriptions, pair tokenization with the `recurring` block so the first payment is authorised as the start of a series rather than a one-off — see [Payment Page](/developers/guides/payment-page#recurring-orders).
 
 ## Step 2: Fetch the Token
 
@@ -138,4 +138,4 @@ Build the re-authorisation path before you need it: a link back to a payment pag
 - [Payments API](https://developers.surfboardpayments.com/api/payments)
 - [Server-to-Server API](/developers/guides/server-to-server-api)
 - [Recurring Payments](/developers/guides/recurring-payments)
-- [Online Payment Link](/developers/guides/online-payment-link)
+- [Payment Page](/developers/guides/payment-page)

@@ -126,10 +126,10 @@ Once your integration is built and tested in the demo environment:
 
 Configure webhooks to receive real-time notifications about order and payment events. Key events include:
 
-- `order.payment.completed` -- Payment was successful
-- `order.payment.cancelled` -- Payment was cancelled
-- `order.payment.failed` -- Payment failed
-- `merchant.application.completed` -- Merchant onboarding completed
+- `order.paymentcompleted` -- Payment was successful
+- `order.paymentcancelled` -- Payment was cancelled
+- `order.paymentfailed` -- Payment failed
+- `order.terminal.event` -- Every terminal state during the transaction
 
 Set up webhook endpoints in the Console under your developer account settings.
 

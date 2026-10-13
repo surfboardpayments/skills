@@ -173,6 +173,8 @@ Include customer, billing, and shipping details when available:
 
 All customer fields are optional but recommended for invoice payments, fraud prevention, and receipt delivery.
 
+To link the order to a customer in your own system, send your own identifier in `customer.customerId`, for example a GUID such as `3f2504e0-4f89-11d3-9a0c-0305e82c3301`. Surfboard stores it as your external reference and returns it as `customer.customerId`. It is not used to match or merge customers on Surfboard's side.
+
 ## Order Line Level Calculation
 
 The `orderLineLevelCalculation` control function changes how `totalOrderAmount` is computed from line items.

@@ -30,7 +30,7 @@ This setup is designed for scenarios where multiple vendors operate in close pro
 Setting up multi-merchant terminals involves three steps:
 
 1. **Create a multi-merchant group** -- Establishes the shared group and generates a group-level merchant and store.
-2. **Add merchants to the group** -- Onboard individual businesses and link them to the group.
+2. **Add merchants to the group** -- Onboard new businesses straight into the group, or link merchants you have already onboarded.
 3. **Register a terminal** -- Assign a physical device to the group so all linked merchants can process payments.
 
 After setup, each merchant creates orders using their own `merchantId`, but the payment is processed on the shared terminal.
@@ -87,7 +87,9 @@ Save the `merchantId` and `storeId` from this response -- you will need them whe
 
 ## Step 2: Add Merchants to the Group
 
-Onboard individual merchants and link them to the multi-merchant group by passing the group's `multiMerchantId` in the standard Create Merchant request.
+There are two ways to get a merchant into the group. A new merchant is linked at onboarding, by passing the group's `multiMerchantId` in the standard Create Merchant request. A merchant you have already onboarded is linked with a separate call, covered in [Adding an Existing Merchant](#adding-an-existing-merchant) below.
+
+> **Warning:** Every merchant and store in a group must have the same zip code as the group. If the zip codes differ, payments on the shared terminal fail. Check the merchant's store address before you add it.
 
 ```
 POST /partners/{partnerId}/merchants
@@ -182,6 +184,40 @@ For PF partners or when full merchant details are required, you can include comp
 }
 ```
 
+### Adding an Existing Merchant
+
+A merchant that is already onboarded under your partner account does not need a new application. Link it to the group with its own `merchantId` in the path and the group's ID in the body:
+
+```
+PUT /partners/{partnerId}/merchants/{merchantId}/multi-merchant-group
+```
+
+**Request:**
+
+```json
+{
+  "multiMerchantId": "8353ffb4664d900d0e"
+}
+```
+
+| Parameter         | Type   | Required | Description |
+|-------------------|--------|----------|-------------|
+| `multiMerchantId` | string | Yes      | The group-level `merchantId` returned from Step 1. |
+
+The `merchantId` in the path is the individual merchant being added, not the group. The zip code rule above applies here too: if the merchant's store sits in a different zip code than the group, its payments on the shared terminal will fail.
+
+To confirm the link, fetch the group's members with `GET /partners/{partnerId}/multi-merchants/{merchantId}`, using the group-level `merchantId`.
+
+### Removing a Merchant from the Group
+
+To take a merchant out of the group, for example when a vendor leaves the food court, call the same path with `DELETE`. There is no request body.
+
+```
+DELETE /partners/{partnerId}/merchants/{merchantId}/multi-merchant-group
+```
+
+Again, the `merchantId` in the path is the individual merchant. The call removes the link to the group only; it is not how you close a merchant account.
+
 ## Step 3: Register a Device to the Group
 
 Once the group is created, register a physical terminal using the group-level `merchantId` and `storeId` from Step 1. This makes the terminal available to all merchants in the group.
@@ -246,6 +282,7 @@ Key points for payment processing on shared terminals:
 ## Important Considerations
 
 - **One location per group.** A multi-merchant group represents a single physical location. If you have vendors across multiple sites, create a separate group for each location.
+- **Same zip code for everyone.** The merchants and stores added to a group must share the group's zip code. If the zip codes differ, payments will fail.
 - **Merchant independence.** Adding a merchant to a group does not affect their ability to have their own dedicated terminals elsewhere. The `multiMerchantId` link only applies to the shared setup.
 - **KYB is still required.** Each merchant must complete their own Know Your Business verification regardless of being part of a group. The group setup does not bypass compliance requirements.
 - **Terminal limits.** You can register multiple terminals to the same group. There is no restriction on the number of devices per group.
@@ -255,5 +292,8 @@ Key points for payment processing on shared terminals:
 | Operation | Method | Endpoint |
 |-----------|--------|----------|
 | Create multi-merchant group | POST | `/partners/{partnerId}/multi-merchant` |
-| Add merchant to group | POST | `/partners/{partnerId}/merchants` |
+| Add new merchant to group | POST | `/partners/{partnerId}/merchants` |
+| Add existing merchant to group | PUT | `/partners/{partnerId}/merchants/{merchantId}/multi-merchant-group` |
+| Remove merchant from group | DELETE | `/partners/{partnerId}/merchants/{merchantId}/multi-merchant-group` |
+| List merchants in a group | GET | `/partners/{partnerId}/multi-merchants/{merchantId}` |
 | Register shared terminal | POST | `/merchants/{merchantId}/stores/{storeId}/devices` |

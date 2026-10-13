@@ -45,14 +45,27 @@ Tap to Pay on iPhone with Surfboard is available in the following countries:
 
 > **Note:** Availability depends on Apple enabling Tap to Pay on iPhone in each market and Surfboard's payment processing coverage. Contact Surfboard if you need support for a country not listed here.
 
+## Supported Payment Methods
+
+Tap to Pay on iPhone accepts contactless cards and NFC mobile wallets:
+
+| Type | Payment methods |
+|------|-----------------|
+| Card schemes | [Visa](/payment-methods/visa), [Mastercard](/payment-methods/mastercard), [American Express](/payment-methods/american-express), [Discover](/payment-methods/discover), [Dankort](/payment-methods/dankort) |
+| Mobile wallets | [Apple Pay](/payment-methods/apple-pay), [Google Pay](/payment-methods/google-pay) and other NFC wallets carrying a supported card |
+
+On-device PIN entry is supported. See [Cardholder Verification & PIN](#cardholder-verification--pin).
+
 ## Supported Devices
 
 Tap to Pay on iPhone requires specific hardware and software:
 
 - **Device:** iPhone XS or later (models with NFC capability).
-- **iOS version:** iOS 16.0 or later. Some features (such as PIN entry) require iOS 16.4+. Check [Apple's ProximityReader documentation](https://developer.apple.com/documentation/proximityreader) for the latest version requirements.
+- **iOS version:** iOS 17.4 or later. Apple also only allows Tap to Pay on recent iOS releases and deprecates older versions over time, roughly one year after a newer release. See [Apple's iOS versions and deprecation management](https://register-docs.apple.com/tap-to-pay-on-iphone/docs/sdk-and-api-guide#ios-versions-and-deprecation-management) for the current list, and advise merchants to keep their iPhone updated.
 - **Beta iOS:** Beta versions of iOS are **not supported** for Tap to Pay on iPhone. Always test on stable iOS releases.
 - **Simulator:** The iOS Simulator supports SDK initialization and terminal registration, but cannot perform real NFC card reads. Use a physical device for end-to-end payment testing.
+
+> **Note:** Minimum device, iOS and SDK versions can change when Apple or the card schemes update their compliance requirements. Follow the [developer changelog](/docs/changelog) for SDK releases and requirement changes.
 
 ## Prerequisites
 
@@ -60,7 +73,7 @@ Before you start, confirm you have the following:
 
 | Category | Requirement |
 |----------|-------------|
-| Apple Developer | Active account with Tap to Pay on iPhone permission |
+| Apple Developer | Active account with the Tap to Pay on iPhone entitlement (development entitlement to build, distribution entitlement to release) |
 | Surfboard credentials | `CONNECTION_BLOB` -- opaque config string provided by Surfboard |
 | Surfboard credentials | `TMS_PUBLIC_KEY` -- retrieved from Developer Portal after registering your SDK app under Console → SDK Apps |
 | Merchant identifiers | `MERCHANT_ID` and `STORE_ID` from your Surfboard merchant onboarding |
@@ -77,29 +90,37 @@ Before you start, confirm you have the following:
   <div class="text-yellow-900">Implementing Tap to Pay on iPhone is a complex process that requires submitting your app to Apple for approval. Plan extra time for the entitlement request and review process, which can take several weeks.</div>
 </div>
 
-Four steps to configure your Apple Developer account and Xcode project for Tap to Pay on iPhone.
+Five steps to configure your Apple Developer account and Xcode project for Tap to Pay on iPhone, plus a final distribution request before release.
 
-### Step 1: Register your App ID
+### Step 1: Request the development entitlement
+
+[Request the Tap to Pay on iPhone entitlement](https://developer.apple.com/documentation/proximityreader/setting-up-the-entitlement-for-tap-to-pay-on-iphone) from your Apple Developer account. Apple first grants a **development entitlement**, which lets you build and test Tap to Pay in your app on real devices.
+
+### Step 2: Register your App ID
 
 In Apple's Certificates, Identifiers & Profiles, create or select an App ID and note the Bundle ID (e.g. `com.yourcompany.yourapp`). Use the same Bundle ID for test and production -- the Surfboard SDK controls environments through the connection blob and backend URLs, not the bundle identifier.
 
-### Step 2: Enable the capability
+### Step 3: Enable the capability
 
 Edit the App ID, find **Tap to Pay on iPhone** under Capabilities, and enable it. Apple may require additional contracts before this is available.
 
-### Step 3: Update provisioning profiles
+### Step 4: Update provisioning profiles
 
 Regenerate your development and distribution profiles for the updated App ID and install them in Xcode.
 
-### Step 4: Add the entitlement in Xcode
+### Step 5: Add the entitlement in Xcode
 
-In your app target under Signing & Capabilities, click "+ Capability" and add **Tap to Pay on iPhone**. Xcode creates the entitlements file automatically. Also add any required `Info.plist` usage descriptions per Apple's ProximityReader documentation.
+In your app target under Signing & Capabilities, click "+ Capability" and add **Tap to Pay on iPhone**. Xcode creates the entitlements file automatically.
 
 The entitlement key that must be present in your `.entitlements` file:
 
 | Entitlement Key | Type | Value |
 |-----------------|------|-------|
 | `com.apple.developer.proximity-reader.payment.acceptance` | Boolean | `true` |
+
+### Before release: request the distribution entitlement
+
+The development entitlement is not enough to ship to the App Store. When internal testing is complete, request the **distribution entitlement** from Apple. Apple reviews your Tap to Pay implementation as part of this request, including the [merchant education](#merchant-education) screen and the [Human Interface Guidelines for Tap to Pay on iPhone](https://developer.apple.com/design/human-interface-guidelines/tap-to-pay-on-iphone).
 
 ### Further reading
 
@@ -224,6 +245,53 @@ Call these three methods in sequence before starting any payment.
 
 For logout or troubleshooting flows, use `disposeTerminal()` to close the session and `clean()` to reset SDK state. After calling `clean()`, you need to re-register the terminal.
 
+## Apple Terms and Conditions
+
+Before a merchant can accept their first payment, Apple requires them to accept the Tap to Pay on iPhone Terms and Conditions with their Apple Account. Apple presents this screen itself the first time the reader is set up for that merchant, and payments can't be taken until the terms are accepted.
+
+- Run the first reader setup in a flow where the merchant is present and expecting it, such as an onboarding or "Enable Tap to Pay" step, not silently in the background.
+- Acceptance is tied to the merchant, so later sessions and app launches don't show the screen again.
+- Follow the onboarding flow in Apple's [Human Interface Guidelines for Tap to Pay on iPhone](https://developer.apple.com/design/human-interface-guidelines/tap-to-pay-on-iphone). Apple checks this during review.
+
+## Merchant Education
+
+<div class="not-prose my-6 p-4 bg-yellow-100 border-l-4 border-yellow-500 rounded-r-md text-sm">
+  <div class="font-semibold font-display text-yellow-800 mb-1">Required by Apple</div>
+  <div class="text-yellow-900">Apple requires your app to show merchants how to accept payments with Tap to Pay on iPhone. Integrate this before you request the distribution entitlement, or your app may not pass review.</div>
+</div>
+
+On iOS 18 and later, use Apple's [ProximityReaderDiscovery API](https://developer.apple.com/documentation/proximityreader/proximityreaderdiscovery) to show Apple's "How to Tap" content. Apple keeps this content up to date and localized for the merchant's region. `ProximityReader` is a built-in iOS framework, so no extra dependency is needed.
+
+The API has two steps: fetch the content with `content(for:)`, then display it with `presentContent(_:from:)`.
+
+```swift
+import ProximityReader
+import UIKit
+
+func showHowToTap(from rootViewController: UIViewController) async throws {
+    guard #available(iOS 18.0, *) else {
+        // Show your own merchant education screen on iOS 17
+        return
+    }
+    let discovery = ProximityReaderDiscovery()
+    let content = try await discovery.content(for: .payment(.howToTap))
+
+    // Present from the topmost view controller, otherwise the call fails
+    var topViewController = rootViewController
+    while let presented = topViewController.presentedViewController {
+        topViewController = presented
+    }
+    discovery.presentContent(content, from: topViewController)
+}
+```
+
+Keep two things in mind:
+
+- **iOS 17 fallback:** `ProximityReaderDiscovery` is only available on iOS 18+. Because the SDK supports iOS 17.4+, provide your own education screen for merchants on iOS 17.
+- **Topmost view controller:** Pass the view controller currently on top of the presentation stack. Walk the `presentedViewController` chain from your root view controller to find it.
+
+A good moment to show this is right after the merchant accepts Apple's terms, and from a help or settings entry the merchant can return to later. For more ideas, such as in-app promotion and email campaigns, see Apple's [Tap to Pay on iPhone marketing guidelines](https://developer.apple.com/tap-to-pay/marketing-guidelines/).
+
 ## Payment Flow
 
 Every payment follows three steps: create an order on your backend, start a transaction through the SDK, and handle the result.
@@ -262,26 +330,30 @@ let cancelResult = await gap.cancelTransaction(paymentId: paymentId)
 
 ## Cardholder Verification & PIN
 
-Tap to Pay on iPhone supports on-device PIN entry starting with **iOS 16.4**. When a contactless transaction requires cardholder verification, the SDK presents a secure PIN input screen on the iPhone.
+Tap to Pay on iPhone supports on-device PIN entry. When a contactless transaction requires cardholder verification, the SDK presents a secure PIN input screen on the iPhone.
 
 ### When is PIN required?
 
 - **NFC wallet payments** (Apple Pay, Google Pay) typically do not require PIN -- the cardholder authenticates via Face ID or passcode on their own device.
-- **Physical contactless cards** may require PIN depending on the transaction amount, card issuer policy, and regional regulations.
+- **Physical contactless cards** may require PIN depending on the transaction amount, card issuer policy, and regional regulations. Contactless limits differ per country, for example around 400 SEK in Sweden and 100 GBP in the UK, and the issuer can also ask for PIN below the limit.
 
-### Regional considerations
+### Offline PIN cards
+
+Tap to Pay on iPhone only supports online PIN. Some cards require offline PIN, which means the card has to be inserted into a physical card reader to verify the PIN. Tap to Pay can't do that, so the terminal rejects the transaction on the device. The transaction is never sent to the issuer for authorisation.
 
 | Region | Consideration |
 |--------|--------------|
-| United Kingdom | Strong Customer Authentication (SCA) may require card insertion for verification. If the card only supports offline PIN, the transaction will decline with an `offline_pin_required` error. |
-| Canada & Finland | Cards that only support offline PIN are not compatible with Tap to Pay on iPhone. These transactions will be declined. |
+| United Kingdom | Depending on the issuer, Strong Customer Authentication (SCA) may require some cards to be inserted for verification. These transactions are rejected by the terminal. |
+| Finland | Many cards issued in Finland support offline PIN only. Transactions that need PIN on these cards are rejected by the terminal. |
 
 <div class="not-prose my-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded-r-md text-sm">
   <div class="font-semibold font-display text-blue-800 mb-1">Recommendation</div>
-  <div class="text-blue-900">If a transaction declines due to PIN or verification issues, ask the customer to try a different card or use an alternative payment method such as a <a href="/products/payment-links" class="text-green-600 hover:underline">Payment Link</a> or a traditional card reader.</div>
+  <div class="text-blue-900">If a transaction is rejected or declined due to PIN or verification issues, ask the customer to try a different card or use an alternative payment method such as a <a href="/products/payment-links" class="text-green-600 hover:underline">Payment Link</a> or a traditional card reader.</div>
 </div>
 
-For more information on contactless transaction limits by country, see [Visa's contactless transaction limits](https://www.visa.co.uk/dam/VCOM/regional/ve/unitedkingdom/PDF/visa-contactless-transaction-limit.pdf).
+### Tapping the card
+
+Ask the customer to hold the card or phone against the top of the iPhone until the read is complete. The card may need to stay in place for a few seconds after the first vibration while the chip data is read. Pulling it away early is a common cause of failed reads.
 
 ## Events & Monitoring
 
@@ -317,13 +389,13 @@ Follow these recommendations to deliver a reliable and polished Tap to Pay exper
 
 ### Reader connection
 
-- **Connect early:** Initialize the SDK and connect to the reader in the background during app startup, so the terminal is ready when the merchant needs to accept a payment.
+- **Connect early:** Initialize the SDK and connect to the reader in the background during app startup, so the terminal is ready when the merchant needs to accept a payment. The exception is the very first setup, which shows Apple's [Terms and Conditions](#apple-terms-and-conditions) and should happen while the merchant is present.
 - **Automatic reconnection:** When your app returns to the foreground, check `gap.isReadyForTransactions` and re-initialize the reader if needed. This ensures the terminal is always available after the app has been backgrounded.
 
 ### User experience
 
 - Follow Apple's [Human Interface Guidelines for Tap to Pay on iPhone](https://developer.apple.com/design/human-interface-guidelines/tap-to-pay-on-iphone) to provide a consistent and intuitive payment experience.
-- On **iOS 18+**, use Apple's `ProximityReaderDiscovery` API to display localized educational content that helps merchants and customers understand how Tap to Pay works.
+- Show Apple's "How to Tap" content as described in [Merchant Education](#merchant-education). Apple requires it for review.
 
 ### Marketing & branding
 
@@ -334,6 +406,12 @@ Follow these recommendations to deliver a reliable and polished Tap to Pay exper
 **Simulator:** Supports SDK initialization and terminal registration. Card presentation is simulated -- no real NFC reads. Use the simulator to validate your integration flow and UI before moving to a device.
 
 **Physical device:** Required for end-to-end payment validation. Needs an iPhone running iOS 17.4+ with NFC. Test at least one full transaction on a real device before release.
+
+### Testing PIN entry
+
+Test PIN entry with real cards. To trigger the PIN screen, use an amount above the local contactless limit, for example more than 400 SEK in Sweden or more than 100 GBP in the UK. Whether PIN is requested also depends on the issuer and the card's own rules, so a card may ask for PIN below the limit or, occasionally, not at all. If a card doesn't trigger PIN, try a card from a different bank.
+
+Cards that require offline PIN are rejected by the terminal instead of showing the PIN screen. See [Offline PIN cards](#offline-pin-cards).
 
 ### Common issues and checks
 
@@ -349,7 +427,9 @@ Verify these items before shipping your app with Tap to Pay on iPhone.
 
 - App ID has Tap to Pay on iPhone capability enabled
 - Provisioning profiles are up to date and installed
-- Required `Info.plist` usage descriptions are present
+- Distribution entitlement has been granted by Apple
+- Merchants are shown Apple's Terms and Conditions in a deliberate onboarding step
+- "How to Tap" merchant education is integrated, with a fallback screen on iOS 17
 
 ### Surfboard configuration
 
@@ -369,6 +449,7 @@ Verify these items before shipping your app with Tap to Pay on iPhone.
 - `gap.isInitialized` returns `true` after startup
 - `gap.terminalId` is populated after registration
 - At least one full transaction completes on a real device
+- A transaction above the local contactless limit shows the PIN screen on a real card
 - Event stream fires expected events: `INITIALIZED`, `TERMINAL_CREATED`, `TRANSACTION_COMPLETED`
 
 ## Reference

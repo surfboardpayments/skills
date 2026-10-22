@@ -1,6 +1,8 @@
 ---
 name: surfboard-testing
 description: "Test and verify a Surfboard Payments integration in the Demo environment: test cards, the payment lifecycle and its terminal states, capture, cancel, void, refund and partial refund, error codes, and proving an integration actually works before reporting success. Use when verifying an integration, debugging a failed payment, or implementing post-payment operations."
+metadata:
+  pack-version: "a9f4a5b0b2b6"
 ---
 
 # Testing and verification

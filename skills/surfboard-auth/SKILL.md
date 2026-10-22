@@ -1,6 +1,8 @@
 ---
 name: surfboard-auth
 description: "Surfboard Payments credentials and authentication: getting Demo API keys from the developer console, the API-KEY/API-SECRET/MERCHANT-ID header model, client auth tokens for browsers and mobile apps, and where each scheme is and is not allowed. Use when setting up Surfboard credentials, debugging a 401 or 403, or calling the API from client-side code."
+metadata:
+  pack-version: "a9f4a5b0b2b6"
 ---
 
 # Surfboard authentication

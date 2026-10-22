@@ -1,6 +1,8 @@
 ---
 name: surfboard-go-live
 description: "Move a Surfboard Payments integration from Demo to Live: certification, production credentials, PCI scope, supported markets and payment methods, settlements and reporting, monitoring, and support escalation. Use when an integration is built and verified in Demo and the user is preparing for real transactions."
+metadata:
+  pack-version: "a9f4a5b0b2b6"
 ---
 
 # Going live

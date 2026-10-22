@@ -22,7 +22,7 @@ If you want to render the card fields inside your own page instead of sending th
 
 1. A developer account at the [Developer Portal](https://developers.surfboardpayments.com/sign-up)
 2. A merchant that has completed onboarding and KYB
-3. Control of the DNS for the webshop domain you are going to register
+3. Control of the DNS, or of the web server, for the webshop domain you are going to register
 
 Orders on the Payment Page are **customer-initiated transactions (CIT)**: the customer is present and completes the payment. **Merchant-initiated transactions (MIT)**, such as subscription renewals charged from your backend, can only be processed by a `MerchantInitiated` terminal. See [Server-to-Server API](/developers/guides/server-to-server-api).
 
@@ -104,7 +104,7 @@ Terms, privacy policy and contact details must also be visible on the webshop it
 
 ## Step 2: Verify the Domains
 
-The response carries one verification key per URL. Publish each as a **TXT record** on the matching domain, then ask Surfboard to check it:
+The response carries one verification key per URL. Publish each as a **TXT record** on the matching domain, or, if you can't edit the domain's DNS, serve it as plain text at `https://<your-domain>/.well-known/sb-domain-verification.txt` (see [Store Management](/developers/guides/store-management#option-b-https-file) for the file format). Then ask Surfboard to check it:
 
 ```json
 POST /partners/:partnerId/merchants/:merchantId/stores/:storeId/verify
@@ -113,7 +113,7 @@ POST /partners/:partnerId/merchants/:merchantId/stores/:storeId/verify
 }
 ```
 
-If you also registered a `paymentPageHostURL` for Self-Hosted Checkout, repeat with `"domainType": "PAYMENT_PAGE_HOST_URL"`. Surfboard also re-checks automatically every six hours, so a record published late is picked up without another call.
+If you also registered a `paymentPageHostURL` for Self-Hosted Checkout, repeat with `"domainType": "PAYMENT_PAGE_HOST_URL"`. Surfboard also re-checks automatically every six hours, so a record or file published late is picked up without another call.
 
 Verification is what unlocks the online terminal types: until the webshop domain passes, there is nothing to register a terminal against. Once it passes, the store goes through an internal approval step at Surfboard. Poll the store to see where it stands:
 
@@ -248,7 +248,7 @@ POST /orders
 }
 ```
 
-`paymentPageLink` is the page to send the customer to. Treat it as opaque and pass it on whole: the query string carries the payment intent, and a link with a trimmed or re-encoded `pi` will not open. `shortLinkUrl` appears only when you asked for it with `generateShortLink`, and is the one to put in an SMS.
+`paymentPageLink` is the page to send the customer to. Treat it as opaque and pass it on whole: the query string carries the payment intent, and a link with a trimmed or re-encoded `pi` will not open. The one thing you can add is a `features` parameter, see [Customize the Page from the Link](#customize-the-page-from-the-link). `shortLinkUrl` appears only when you asked for it with `generateShortLink`, and is the one to put in an SMS.
 
 Keep the `orderId`. Everything afterwards is keyed on it, and unlike an in-store order there is no `paymentId` yet: nothing has been attempted until the customer opens the page. The `paymentId` arrives with the first attempt, in the status response and in the webhook.
 
@@ -284,7 +284,7 @@ These sit directly on `controlFunctions`, next to `online`. They are not online-
 |-------|------|-------------|
 | `initiatePaymentsOptions` | object | Start the payment with a given `paymentMethod`, for example `CARD`. |
 | `lockToPaymentMethods` | array | Restrict the page to the methods you list, e.g. `["CARD", "KLARNA"]`. |
-| `authMode` | string | `AUTH` or `PRE-AUTH`. Default `AUTH`. Choosing `PRE-AUTH` sets `delayCapture` for you. |
+| `authMode` | string | `AUTH` (default) charges the card when the customer pays. `PRE-AUTH` only holds the amount and sets `delayCapture` for you; you capture the final amount, lower or higher, later. |
 | `delayCapture` | boolean | Authorize now, capture later. See [Capture a Payment](/developers/guides/capture-a-payment). |
 | `delayPayout` | string | Hold the payout for a period, as `<number><unit>`. |
 | `cancelPreviousPendingOrder` | boolean | Cancel all previous pending orders when this one is created. |
@@ -442,6 +442,29 @@ The link is a URL, so how it reaches the customer is your call:
 - **QR code** printed or shown on screen, for pay-at-table and self-service.
 
 Two things to hold on to. Set `paymentPageValidFor` deliberately — a link that lives for three days is a link someone can pay three days late, after you have cancelled the order. And never treat the arrival at `redirectUrl` as proof of payment: a customer can reach that URL by other means. The webhook and the status call are the record.
+
+## Customize the Page from the Link
+
+A few display options are set on the link itself rather than on the order. Append a `features` parameter to `paymentPageLink`, leaving the rest of the link untouched, as a comma-separated list of `key:value` pairs:
+
+```
+https://pay.withsurfboard.com/8455c12f9fd0620a010b?pi=...&add=...&features=method:SSWISH,show_footer:off,lang:en
+```
+
+| Option | What it does |
+|--------|--------------|
+| `method:<ID>` | Puts that payment method first in the list. This is the only ordering control. |
+| `show_footer:off` | Hides the footer. |
+| `show_top:off` | Hides the top block. |
+| `minimal:on` | Hides the sidebar and the extras in the payment footer. The sidebar still shows on the success page. |
+| `lang:<code>` | Sets the page's default language: `en`, `sv`, `da`, `fi` or `no`. |
+| `address_autofill:off` | Turns off Google address autofill in the billing address form. |
+
+This only works on the full `paymentPageLink`. The options can't be applied to `shortLinkUrl`, so if you want them in an SMS or a QR code, send the full link instead.
+
+`method` takes the ID of any payment method the page supports, for example `CARD`, `KLARNA`, `SSWISH`, `SVIPPS` or `SMOBILEPAY`. New methods get their own ID as they are added to the page, so this list is not exhaustive. The method is only moved to the top if it is available for the order; otherwise the page keeps its default order, which puts the method the customer chose last time first and then card. To limit which methods appear at all, use `lockToPaymentMethods` on the order instead.
+
+Unknown keys and unsupported `lang` values are ignored. The options apply when the page opens: if the customer picks another payment method or switches language themselves, their choice wins.
 
 ## Error Handling
 

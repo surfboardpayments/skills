@@ -232,7 +232,16 @@ To authorize payment now but capture funds later (e.g., at shipment), set `delay
 }
 ```
 
-You can also use `authMode: "PRE-AUTH"` for pre-authorization flows, which automatically enables delayed capture and lets you capture a different amount than originally authorized.
+When the final amount isn't known yet, use `authMode: "PRE-AUTH"` instead (spelled with a hyphen). It holds the amount, turns on delayed capture for you, and lets you capture a lower or higher amount later:
+
+```json
+{
+  "controlFunctions": {
+    "authMode": "PRE-AUTH",
+    "initiatePaymentsOptions": { "paymentMethod": "CARD" }
+  }
+}
+```
 
 See the [Capture a Payment](/developers/guides/capture-a-payment) guide for the full flow.
 

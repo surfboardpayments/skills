@@ -117,8 +117,8 @@ POST   /merchants/:merchantId/orders   404, and the 404 does not say why
 ```
 
 Only partner-level endpoints put an ID in the path, and they use `partnerId`:
-stores, merchant onboarding, billing plans, logistics, branding, client auth tokens.
-45 of the 157 endpoints are partner-scoped; none of them are orders, payments, or
+stores, merchant onboarding, service providers, billing plans, logistics, branding, client auth tokens.
+72 of the 237 endpoints are partner-scoped; none of them are orders, payments, or
 receipts.
 
 If you are reading an older copy of a guide that shows
@@ -210,8 +210,8 @@ so plainly rather than implying it works.
 
 ## Finding more
 
-Bundled with this skill: `references/guides/` holds: API conventions, payment lifecycle,
-payment methods.
+Bundled with this skill: `references/guides/` holds: getting started (accounts, keys,
+environments, which guides to read next), API conventions, payment lifecycle, payment methods.
 
 Beyond that, three authoritative developer sources. Use the `www` host on the second and
 third, because the apex redirects and not every fetcher follows redirects.
@@ -219,8 +219,8 @@ third, because the apex redirects and not every fetcher follows redirects.
 | Question | Source |
 |---|---|
 | What does this endpoint take, what does this webhook send? | <https://ai.developers.surfboardpayments.com/llms.txt>, which links a `.md` per page |
-| How does this flow fit together end to end? | <https://www.surfboardpayments.com/api/ai/guides.json>, 44 guides with full text inline |
-| What endpoints exist at all? | <https://www.surfboardpayments.com/api/ai/docs.json>, 157 endpoints grouped by API |
+| How does this flow fit together end to end? | <https://www.surfboardpayments.com/api/ai/guides.json>, every guide with full text inline |
+| What endpoints exist at all? | <https://www.surfboardpayments.com/api/ai/docs.json>, every endpoint grouped by API |
 
 Or search them through the MCP server: `npx -y @surfboardpayments/surf-mcp`
 (`search_api_docs`, `search_webhook_docs`, `search_guides`, `read_doc`).

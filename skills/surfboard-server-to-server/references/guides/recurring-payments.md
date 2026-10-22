@@ -148,9 +148,13 @@ POST /payments
 {
   "orderId": "ORDER_ID_FROM_ABOVE",
   "paymentMethod": "CTOKEN",
-  "tokenId": "STORED_TOKEN_ID"
+  "paymentMethodParams": {
+    "tokenId": "STORED_TOKEN_ID"
+  }
 }
 ```
+
+> The `tokenId` goes inside `paymentMethodParams`. Sent at the top level, the payment is rejected with `PS_0046: TokenID is required to perform CTOKEN payments`.
 
 ### Verify the result
 

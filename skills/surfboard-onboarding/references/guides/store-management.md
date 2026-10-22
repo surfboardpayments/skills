@@ -134,13 +134,54 @@ You must complete domain verification before the store is approved for online pa
 
 ## Domain Verification
 
-After creating an online store, verify that you own the domains you provided. This is a two-step process.
+After creating an online store, verify that you own the domains you provided. This is a two-step process: publish the verification key, then trigger the check.
 
-### Step 1: Set DNS TXT Records
+### Step 1: Publish the Verification Keys
 
-Take the verification keys returned during store creation and add them as **TXT records** on your domain's DNS configuration. Surfboard also performs automatic checks every 6 hours.
+The keys are returned when the store is created, and you can fetch them again at any time with [Fetch Store Domains](https://developers.surfboardpayments.com/api/stores):
+
+```
+GET /partners/:partnerId/merchants/:merchantId/stores/:storeId/online
+```
+
+Each entry in `domains` carries the domain `name` to verify and its `verificationKey`. Publish each key in one of two ways.
+
+#### Option A: DNS TXT record
+
+Add the verification key as a **TXT record** in the domain's DNS configuration.
+
+#### Option B: HTTPS file
+
+If you can serve pages on the domain but can't edit its DNS, serve the key from a well-known file instead. This suits platforms that host a merchant's custom domain while the DNS stays with the merchant's own provider: you can publish the file for every merchant automatically, with no action from them.
+
+Serve the file on the same host as the URL you registered on the store:
+
+```
+https://<your-domain>/.well-known/sb-domain-verification.txt
+```
+
+If the store's URL is `https://www.example.com`, serve it at `https://www.example.com/.well-known/sb-domain-verification.txt`. Serving it on the root domain, `https://example.com/.well-known/sb-domain-verification.txt`, also works. You only need one of the two.
+
+- The URL you serve it on must return `200` directly over HTTPS, with no redirect. If your root domain redirects to `www`, serve the file on the `www` host.
+- Serve it as plain text (`Content-Type: text/plain`), not JSON.
+- The body is the verification key with its `sb-domain-verification-key=` prefix.
+- If the store has two keys (webshop and payment page) on the same domain, put both in the same file, one per line.
+
+```
+sb-domain-verification-key=7fd242dd862a9f9f74ae11d62216f5729a5e5600e00b8d44300db41b4efcce68
+```
+
+Check it before you trigger verification:
+
+```bash
+curl -i https://www.example.com/.well-known/sb-domain-verification.txt
+```
+
+The response should be `200` with `content-type: text/plain` and the key in the body.
 
 ### Step 2: Trigger Verification
+
+Surfboard checks pending domains automatically every 6 hours, through either method, so a store waiting for verification is picked up without further action once the record or file is live. To verify right away, call:
 
 ```
 POST /partners/:partnerId/merchants/:merchantId/stores/:storeId/verify

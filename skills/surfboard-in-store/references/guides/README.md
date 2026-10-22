@@ -1,6 +1,6 @@
 # surfboard-in-store: bundled guides
 
-Generated from https://www.surfboardpayments.com/api/ai/guides.json (48 guides, updated 2026-10-13).
+Generated from https://www.surfboardpayments.com/api/ai/guides.json (48 guides, updated 2026-10-20).
 Do not edit these by hand; edit the guide on the marketing site and re-run `npm run skills`.
 
 - [Create an Order](./create-an-order.md): Learn how to create orders with line items, tax, customer details, and control functions. The starting point for accepting payments with the Surfboard API.
@@ -14,3 +14,8 @@ Do not edit these by hand; edit the guide on the marketing site and re-run `npm 
 - [Partial Payments](./partial-payments.md): Split an order across multiple payment methods or transactions. Accept card, cash, and Swish in any combination to settle a single order.
 - [NFC Tag Reading](./nfc-tag-reading.md): Use the NFC Reading API to create tag-reading sessions on payment terminals, scan NFC/RFID-tagged products, and retrieve scanned tag data.
 - [Create Order Error Codes](./create-order-error-codes.md): Reference of error codes returned by the create order and initiate payment flows, with notes on when each is thrown and how to handle it.
+- [Receipt Printing](./receipt-printing.md): How to print a receipt on a terminal with a built-in printer or on the FinPrinter: let Surfboard render it from a template, or build the layout yourself and send ESC/POS to a terminal. How to choose, and how to set up each.
+- [ESC/POS Printing](./escpos-printing.md): Send custom ESC/POS receipts to any Surfboard terminal using the UTF-8 contract: opt in with one field, get validated payloads and consistent output across current and legacy hardware.
+- [Product Catalog](./product-catalog.md): Create and manage product catalogs, products, variants, inventory levels, and analytics through the Catalog API.
+- [Gift Cards & Promotions](./gift-cards-promotions.md): Issue and manage gift cards, track transactions, and create marketing promotions using the Surfboard Payments APIs.
+- [Build Your Own ECR](./electronic-cash-register.md): Turn your ERP or business system into a compliant point of sale for Sweden. Product catalog, fiscal cash register with control unit, Skatteverket declaration, shifts, cash handling, orders, receipts, and Z-reports on the Surfboard platform.

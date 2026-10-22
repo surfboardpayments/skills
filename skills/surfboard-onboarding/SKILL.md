@@ -65,6 +65,15 @@ Partner, merchant, store, and terminal branding is hierarchical: the most specif
 level wins. Set partner-level defaults once and override per merchant only where it
 matters. `references/guides/partner-branding.md`.
 
+To get a merchant a product image or a branded portal without design work,
+`references/guides/ai-merchandising.md` covers the two endpoints that generate them.
+
+## Service providers
+
+To route a share of each payment to a third party (Surfboard Flow), onboard the
+service provider and link it to the merchant during onboarding. Then set the split per
+order under `controlFunctions.serviceProviders`. `references/guides/service-providers.md`.
+
 ## Getting this right
 
 - **Idempotency.** Merchant creation retried after a timeout must not create two
@@ -83,5 +92,5 @@ its terminals. Show the user the merchant ID, store ID, and terminal IDs.
 
 ## Bundled guides
 
-`references/guides/` holds: merchant onboarding, store management, account and service
-provider management, partner branding.
+`references/guides/` holds: merchant onboarding, store management, account management,
+partner branding, service providers and split payouts, AI merchandising.

@@ -140,6 +140,11 @@ Check `status` in the envelope, not the HTTP code.
 Digital receipts go out through the Receipts API. `references/guides/receipts.md`
 covers the shape, including emailing and the hosted receipt URL.
 
+Paper receipts on a terminal with a printer, or on the FinPrinter, take one of two paths:
+let Surfboard render a printing template, or send your own ESC/POS.
+`references/guides/receipt-printing.md` helps you choose. If you choose ESC/POS, follow the
+UTF-8 contract in `references/guides/escpos-printing.md`.
+
 ## Reference implementation
 
 ```ts
@@ -216,6 +221,13 @@ def charge(minor_units: int, terminal_id: str):
 | Read an NFC tag | `references/guides/nfc-tag-reading.md` |
 | Branded screens on the terminal | `references/guides/pos-templates.md` |
 | A full EMV terminal integration | `references/guides/emv-terminal-integration.md` |
+| Products, variants and stock behind the POS | `references/guides/product-catalog.md` |
+| Gift cards and promotions | `references/guides/gift-cards-promotions.md` |
+| A fiscal cash register for Sweden (control unit, Skatteverket, Z-reports) | `references/guides/electronic-cash-register.md` |
+
+The Electronic Cash Register (ECR V2) has a new release due in late October 2026. If
+the ECR guide and the endpoint reference at
+<https://ai.developers.surfboardpayments.com/llms.txt> disagree, follow the endpoint reference.
 
 ## When it fails
 

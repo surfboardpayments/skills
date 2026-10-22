@@ -96,6 +96,11 @@ Exact request shape: `references/guides/server-to-server-api.md`.
 Invoice-based billing rather than card-on-file is a separate flow.
 `references/guides/b2b-invoices.md`.
 
+## Split payouts
+
+To route part of each charge to a third party, set `controlFunctions.serviceProviders`
+on the order. `references/guides/service-providers.md`.
+
 ## Verify before reporting success
 
 Run stage 1 in Demo to completion, confirm a token came back, then run one stage 2
@@ -104,4 +109,5 @@ fails at the first renewal, in production, a month after everyone stopped lookin
 
 ## Bundled guides
 
-`references/guides/` holds: server-to-server API, recurring payments, tokens, B2B invoices.
+`references/guides/` holds: server-to-server API, recurring payments, tokens, B2B invoices,
+service providers and split payouts.

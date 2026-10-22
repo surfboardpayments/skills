@@ -378,7 +378,7 @@ For an online store, add `onlineInfo` with your webshop URLs:
 Online stores in production require domain verification before they can process payments:
 
 1. **Get verification keys** -- returned in the Create Store response (`merchantURLDomainVerificationKey` and `paymentPageURLDomainVerificationKey`)
-2. **Add DNS TXT record** -- add the verification key as a TXT record on your domain
+2. **Publish the key** -- add the verification key as a TXT record on your domain, or serve it at `https://<your-domain>/.well-known/sb-domain-verification.txt` if you can't edit the DNS (see [Store Management](/developers/guides/store-management#option-b-https-file))
 3. **Trigger verification** -- Surfboard checks automatically every 6 hours, or use the Verify Domain API to trigger it manually
 4. **Monitor status** -- use the Fetch Store Details API to check the `onlineOnboardingStatus` field
 

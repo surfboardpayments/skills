@@ -16,6 +16,18 @@ When you create an order with `delayCapture: true` or `authMode: "PRE-AUTH"`, fu
 
 This guide walks through the full capture flow: create an authorized order, capture the payment, and verify the result.
 
+## Delay Capture or Pre-Authorization?
+
+Both authorize the card now and charge it later. The difference is what you can capture:
+
+| | `delayCapture: true` | `authMode: "PRE-AUTH"` |
+|---|---|---|
+| At checkout | The full amount is authorized | The amount is held on the card |
+| What you capture | Exactly the authorized amount | The final amount: the same, lower, or higher |
+| Capture body | Empty `{}` | `{ "amount": ... }`, or empty for the held amount |
+| Typical use | Capture at shipment | Hotel stays, car rental, bar tabs |
+| `delayCapture` | You set it | Set for you |
+
 ## When to Use Delay Capture
 
 | Scenario | Description |
@@ -102,12 +114,11 @@ Surfboard never captures or voids an authorization automatically. If you neither
 
 ### Pre-Authorization Mode
 
-For flows where the final capture amount may differ from the authorized amount, use `authMode: "PRE-AUTH"`. This automatically enables `delayCapture`:
+When the final amount isn't known at checkout, for example a hotel stay where the minibar is added at check-out, hold an amount with `authMode: "PRE-AUTH"` and capture the real total later. Set it on `controlFunctions`, spelled `PRE-AUTH` with a hyphen. `delayCapture` is turned on for you, so you don't need to send it:
 
 ```json
 {
   "controlFunctions": {
-    "delayCapture": true,
     "authMode": "PRE-AUTH",
     "initiatePaymentsOptions": {
       "paymentMethod": "CARD"
@@ -115,6 +126,15 @@ For flows where the final capture amount may differ from the authorized amount, 
   }
 }
 ```
+
+**What the customer and you see after they pay:**
+
+- The order and payment read `PAYMENT_COMPLETED`, the same as a normal sale. For a pre-authorized order this means *held*, not charged. Nothing is charged until you capture.
+- The transaction is a `PURCHASE` with `settlementStatus: "NOT_SETTLED"` until the capture is processed.
+
+**Changing the amount:** once the customer has paid, the order itself can't be edited (Update Order answers `OR_0041`). Send the final amount with the capture instead, as shown in Step 2.
+
+**Not charging at all:** [void the payment](/developers/guides/payment-lifecycle#void-a-payment) before you capture. That releases the whole hold.
 
 ## Step 2: Capture the Payment
 
@@ -125,7 +145,10 @@ POST /payments/:paymentId/capture
 {}
 ```
 
-For `PRE-AUTH` orders, you can specify a different capture amount:
+For `PRE-AUTH` orders, send the final amount in the smallest currency unit. It can differ from the held amount in either direction:
+
+- **Lower**, e.g. 300 SEK on a 500 SEK hold: only 300 SEK is charged.
+- **Higher**, e.g. 650 SEK on a 500 SEK hold, for extras added at check-out.
 
 ```json
 POST /payments/:paymentId/capture
@@ -133,6 +156,8 @@ POST /payments/:paymentId/capture
   "amount": 45000
 }
 ```
+
+Leave the body empty (`{}`) to capture exactly the held amount.
 
 ```json
 // Response
@@ -142,7 +167,7 @@ POST /payments/:paymentId/capture
 }
 ```
 
-> The `amount` field is only valid for `PRE-AUTH` orders. For standard `delayCapture`, send an empty body to capture the full authorized amount.
+> The `amount` field is only valid for `PRE-AUTH` orders. For an order with only `delayCapture`, send an empty body to capture the full authorized amount.
 
 A `SUCCESS` response means the capture request was accepted and sent on. For cards, captures are processed asynchronously in batches, and the acquirer can still decline the capture afterwards, so a successful response is not yet a completed capture.
 

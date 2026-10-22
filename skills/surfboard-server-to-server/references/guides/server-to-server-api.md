@@ -114,9 +114,13 @@ curl -X POST YOUR_API_URL/payments \
   -d '{
     "orderId": "YOUR_ORDER_ID",
     "paymentMethod": "CTOKEN",
-    "tokenId": "YOUR_TOKEN_ID"
+    "paymentMethodParams": {
+      "tokenId": "YOUR_TOKEN_ID"
+    }
   }'
 ```
+
+> The `tokenId` goes inside `paymentMethodParams`. Sent at the top level, the payment is rejected with `PS_0046: TokenID is required to perform CTOKEN payments`.
 
 ### Step 3: Check Order Status
 

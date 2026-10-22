@@ -29,6 +29,8 @@ The SDK sends the host of the page it runs on, and Surfboard checks it against t
 
 If a merchant takes payments on more than one domain, for example their own webshop and a white-label site, create one online store per domain, each with its own `paymentPageHostURL` and its own SelfHostedPage terminal.
 
+Each `paymentPageHostURL` has to pass domain verification before the store can take payments. If you host checkout on merchants' custom domains but their DNS sits with their own provider, you don't need them to add a TXT record: serve the verification key from `https://<your-domain>/.well-known/sb-domain-verification.txt` instead. See [Domain Verification](/developers/guides/store-management#domain-verification) for the file format.
+
 > **Tip:** You can retrieve the terminal's public key later using the [Fetch Terminal by ID API](https://developers.surfboardpayments.com/api/terminals). It is returned as `terminalPublicKey` in the response.
 
 ## Initializing the SDK

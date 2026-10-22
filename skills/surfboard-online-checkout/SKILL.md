@@ -115,6 +115,13 @@ store, and terminal, with the more specific level overriding the broader one.
 
 `references/guides/partner-branding.md`.
 
+## Split payouts and gift cards
+
+To send a share of the payment to a third party, add it under
+`controlFunctions.serviceProviders` on the order. The provider has to be onboarded and
+linked to the merchant first: `references/guides/service-providers.md`. Gift cards and
+promotions are issued through their own APIs: `references/guides/gift-cards-promotions.md`.
+
 ## Verify before reporting success
 
 Create an order in Demo, open the payment page URL, complete a test card payment, and
@@ -124,4 +131,5 @@ status.
 ## Bundled guides
 
 `references/guides/` holds: payment page, self-hosted checkout, payment links, create an
-order, payment methods, partner branding, create order error codes.
+order, payment methods, partner branding, create order error codes, service providers
+and split payouts, gift cards and promotions.

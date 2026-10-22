@@ -63,7 +63,7 @@ Every payment ends in one of three terminal states. Once a payment reaches a ter
 
 | Payment Status | Order Status | Description |
 |----------------|--------------|-------------|
-| `PAYMENT_COMPLETED` | `PAYMENT_COMPLETED` | Payment succeeded and the order is closed. For a `delayCapture` order this means the payment is authorized; funds are captured only when you [capture the payment](#capture-a-payment). |
+| `PAYMENT_COMPLETED` | `PAYMENT_COMPLETED` | Payment succeeded and the order is closed. For a `delayCapture` or `PRE-AUTH` order this means the payment is authorized (held); funds are captured only when you [capture the payment](#capture-a-payment). |
 | `PAYMENT_CANCELLED` | `PENDING` | Payment was cancelled -- the order remains open and a new payment can be initiated using the existing `orderId`. |
 | `PAYMENT_FAILED` | `PENDING` | Payment failed -- the order remains open and a new payment can be initiated using the existing `orderId`. |
 
@@ -103,7 +103,7 @@ Store both `orderId` and `paymentId` -- you need them for all subsequent operati
 
 ### Delay Capture
 
-To authorize now but capture later (e.g., charge at shipment), set `delayCapture: true` in `controlFunctions`. You can also use `authMode: "PRE-AUTH"` for pre-authorization flows, which automatically enables delayed capture.
+To authorize now but capture later (e.g., charge at shipment), set `delayCapture: true` in `controlFunctions`. When the final amount isn't known yet (a hotel stay, a bar tab), use `authMode: "PRE-AUTH"` instead: it holds the amount, turns on delayed capture for you, and lets you capture a lower or higher amount later.
 
 ## Capture a Payment
 
@@ -114,7 +114,7 @@ POST /payments/:paymentId/capture
 { "amount": 50000 }
 ```
 
-The `amount` field is only required for `PRE-AUTH` orders where you capture a different amount than authorized. For standard delayed capture, send an empty body `{}`.
+The `amount` field is only for `PRE-AUTH` orders, to capture a different amount than was held: lower, or higher for extras. Leave it out to capture the held amount. For an order with only `delayCapture`, always send an empty body `{}`.
 
 ```json
 // Response

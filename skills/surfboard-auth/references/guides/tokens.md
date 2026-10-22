@@ -106,19 +106,20 @@ Store it where you would store an account identifier: your primary datastore, en
 
 ## Charging a Stored Token
 
-Pass it into a payment through `paymentMethodParams`:
+Pass it into a payment with `paymentMethod: "CTOKEN"` and the token inside `paymentMethodParams`:
 
 ```json
 POST /payments
 {
   "orderId": "83a1ba32774149710b",
-  "paymentMethod": "CARD",
-  "amount": 19900,
+  "paymentMethod": "CTOKEN",
   "paymentMethodParams": {
     "tokenId": "822d544dc48c200308"
   }
 }
 ```
+
+> The `tokenId` goes inside `paymentMethodParams`. Sent at the top level, the payment is rejected with `PS_0046: TokenID is required to perform CTOKEN payments`.
 
 A charge with no customer present is a Merchant Initiated Transaction, and it needs a terminal in `MerchantInitiated` mode — the terminal the customer paid on cannot do it. An online store is provisioned with one, so this is usually a matter of reading the store's terminal list rather than registering anything. [Server-to-Server API](/developers/guides/server-to-server-api) covers the setup and the rules that come with MIT.
 

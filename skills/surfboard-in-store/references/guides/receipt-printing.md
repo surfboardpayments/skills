@@ -12,7 +12,7 @@ generated: true
 
 ## Overview
 
-Surfboard prints on two kinds of device: [terminals with a built-in printer](/products/?requirements=printer), such as SurfPrint Pro, and the [FinPrinter](/products/fins/finprinter), the standalone cloud printer for a counter, a pickup point or a kitchen. There are two ways to get a receipt onto paper, and you pick whichever fits your POS better. Both paths work on both kinds of device. On the FinPrinter, the ESC/POS path is sent without the `codePages` opt-in; see [ESC/POS on the FinPrinter](#escpos-on-the-finprinter).
+Surfboard prints on two kinds of device: [terminals with a built-in printer](/products/?requirements=printer), such as SurfPrint Pro, and the [FinPrinter](/products/fins/finprinter/), the standalone cloud printer for a counter, a pickup point or a kitchen. There are two ways to get a receipt onto paper, and you pick whichever fits your POS better. Both paths work on both kinds of device. On the FinPrinter, the ESC/POS path is sent without the `codePages` opt-in; see [ESC/POS on the FinPrinter](#escpos-on-the-finprinter).
 
 | | Printing templates | ESC/POS |
 |---|---|---|
@@ -20,19 +20,19 @@ Surfboard prints on two kinds of device: [terminals with a built-in printer](/pr
 | What you send | An ID: `paymentId`, `transactionId` or `orderId` | The complete ESC/POS byte stream |
 | Layout control | Add or remove pre-defined receipt elements | Full control, line by line |
 | Where the layout lives | Partner Portal, at partner, merchant or store level | Your code |
-| Requirement | `orderLines` on the order | UTF-8 text inside the [ESC/POS contract](/developers/guides/escpos-printing) |
+| Requirement | `orderLines` on the order | UTF-8 text inside the [ESC/POS contract](/developers/guides/escpos-printing/) |
 | Fonts | Handled by the template | One font, with bold and size variations |
 | Maintenance | Surfboard | You |
 | Prints more than receipts | No | Yes: kitchen slips, bongs, pickup tickets |
 
 If you already send `orderLines` on every order and want a receipt that looks right without owning its layout, use templates. If you need a layout Surfboard does not offer, or you want to print things that are not receipts at all, use ESC/POS. The two are not exclusive: many integrations print the customer receipt from a template and a kitchen slip from ESC/POS on the same device.
 
-> **Note:** This guide is about paper. For email receipts, hosted receipt links and the fiscal receipt fields, see the [Receipts](/developers/guides/receipts) guide.
+> **Note:** This guide is about paper. For email receipts, hosted receipt links and the fiscal receipt fields, see the [Receipts](/developers/guides/receipts/) guide.
 
 ## Prerequisites
 
 - A Surfboard developer account with valid API credentials (`API-KEY` and `API-SECRET`)
-- A [terminal with a built-in printer](/products/?requirements=printer) or a [FinPrinter](/products/fins/finprinter), registered to a merchant and store, and its `terminalId`
+- A [terminal with a built-in printer](/products/?requirements=printer) or a [FinPrinter](/products/fins/finprinter/), registered to a merchant and store, and its `terminalId`
 - For templates: orders created with `orderLines`, and access to the Partner Portal
 
 ## The printers
@@ -42,11 +42,11 @@ Both kinds of device are registered the same way and get a `terminalId`, so the 
 | Device | Printer | Paper | Typical placement |
 |---|---|---|---|
 | [Terminals with a built-in printer](/products/?requirements=printer) | Built in | 58 mm | Handheld: prints at the table, on the floor or at the counter |
-| [FinPrinter](/products/fins/finprinter) | Standalone, cloud-connected | 80 mm | Counter, pickup point or kitchen, with no terminal beside it |
+| [FinPrinter](/products/fins/finprinter/) | Standalone, cloud-connected | 80 mm | Counter, pickup point or kitchen, with no terminal beside it |
 
 **Terminals with a built-in printer** print where the payment happens. The terminal that took the payment is the default target of the print call, so a receipt on the device the customer just tapped needs no `terminalId` at all. The current line-up is on the [products page](/products/?requirements=printer), filtered to devices with a printer.
 
-**FinPrinter** has no screen and takes no payments. It connects over Wi-Fi or Ethernet, and you register it with the same device registration call as a terminal, using the serial number on the back of the unit as the registration identifier. See [Device Registration](/developers/guides/device-registration). Once registered it shows up as a device next to the merchant's terminals in the portals and the API, and both print endpoints accept its `terminalId`. It also has a drawer port, so it can [open a cash drawer](#open-a-cash-drawer). Because every job routes through Surfboard's cloud, your POS needs no driver and no cable to the printer.
+**FinPrinter** has no screen and takes no payments. It connects over Wi-Fi or Ethernet, and you register it with the same device registration call as a terminal, using the serial number on the back of the unit as the registration identifier. See [Device Registration](/developers/guides/device-registration/). Once registered it shows up as a device next to the merchant's terminals in the portals and the API, and both print endpoints accept its `terminalId`. It also has a drawer port, so it can [open a cash drawer](#open-a-cash-drawer). Because every job routes through Surfboard's cloud, your POS needs no driver and no cable to the printer.
 
 Templates adapt to the paper width on their own, so the same template prints correctly on both devices.
 
@@ -80,9 +80,9 @@ PATCH /merchants/{merchantId}/configuration
 
 ### Send order lines
 
-The one requirement on this path is that the receipt data comes from the order, so `orderLines` must be present on the [create order](/developers/guides/create-an-order) call. An order created without lines has nothing for the template to render. If your POS already sends lines, which it does if the terminal shows a basket, there is no extra work beyond setting up the template.
+The one requirement on this path is that the receipt data comes from the order, so `orderLines` must be present on the [create order](/developers/guides/create-an-order/) call. An order created without lines has nothing for the template to render. If your POS already sends lines, which it does if the terminal shows a basket, there is no extra work beyond setting up the template.
 
-The fiscal fields that Nordic regulators expect on a receipt, such as the register name and control unit serial, are stored against the order separately with `PUT /receipts/{orderId}`. That call is covered in [Receipts](/developers/guides/receipts), and the template picks the fields up when they are present.
+The fiscal fields that Nordic regulators expect on a receipt, such as the register name and control unit serial, are stored against the order separately with `PUT /receipts/{orderId}`. That call is covered in [Receipts](/developers/guides/receipts/), and the template picks the fields up when they are present.
 
 ### Print
 
@@ -119,7 +119,7 @@ Which template renders is decided by the configuration in the Partner Portal, re
 
 > **Note:** The older `PUT /receipts/{id}/print` form, which took a `templateId` and a `language` in the body, still works but is superseded by the `POST` above. New integrations should use `POST`.
 
-For a register built on Surfboard, the order itself can carry `autoPrintReceipt` under `controlFunctions.receipt`, so the receipt prints when the payment completes with no print call at all. See [Build Your Own ECR](/developers/guides/electronic-cash-register).
+For a register built on Surfboard, the order itself can carry `autoPrintReceipt` under `controlFunctions.receipt`, so the receipt prints when the payment completes with no print call at all. See [Build Your Own ECR](/developers/guides/electronic-cash-register/).
 
 ## Path 2: ESC/POS
 
@@ -145,14 +145,14 @@ Note that the path takes a `terminalId`, not a payment or order ID. Nothing ties
 Three things to know before you commit to this path:
 
 - **One font.** The terminal printers support a single typeface, with bold, a condensed variant and two larger sizes. If a design calls for anything else, it has to be sent as an image, and images are capped at 384 dots wide.
-- **The contract is enforced.** With `"codePages": "UTF-8"` set, the stream is validated before it reaches hardware. Text must be UTF-8, only a fixed set of commands is accepted, and an invalid stream is rejected whole with `PR_0006` rather than printed halfway. The full rules, a worked receipt and a preflight validator are in [ESC/POS Printing](/developers/guides/escpos-printing).
+- **The contract is enforced.** With `"codePages": "UTF-8"` set, the stream is validated before it reaches hardware. Text must be UTF-8, only a fixed set of commands is accepted, and an invalid stream is rejected whole with `PR_0006` rather than printed halfway. The full rules, a worked receipt and a preflight validator are in [ESC/POS Printing](/developers/guides/escpos-printing/).
 - **Formatting and maintenance sit with you.** Line widths differ by text size, starting from 32 columns of normal text on a 58 mm terminal, so every line has to be fitted by your code. When a merchant wants a different footer, that is a change in your code, not in a portal.
 
 The trade is the same one a template makes in the other direction: you own the layout, so you own the work of keeping it right.
 
 ## ESC/POS on the FinPrinter
 
-The [FinPrinter](/products/fins/finprinter) takes ESC/POS on the same endpoint, addressed by its own `terminalId`:
+The [FinPrinter](/products/fins/finprinter/) takes ESC/POS on the same endpoint, addressed by its own `terminalId`:
 
 ```
 PUT /receipts/{terminalId}/escpos
@@ -166,7 +166,7 @@ PUT /receipts/{terminalId}/escpos
 }
 ```
 
-Leave `codePages` out. The `"UTF-8"` opt-in is only for payment terminals with a built-in printer: with it set, the API prepares the stream for those printers and adds a command the FinPrinter is not meant to receive. The validated contract, its command list and its line widths in [ESC/POS Printing](/developers/guides/escpos-printing) do not apply here.
+Leave `codePages` out. The `"UTF-8"` opt-in is only for payment terminals with a built-in printer: with it set, the API prepares the stream for those printers and adds a command the FinPrinter is not meant to receive. The validated contract, its command list and its line widths in [ESC/POS Printing](/developers/guides/escpos-printing/) do not apply here.
 
 As on every ESC/POS job, the decoded stream must start with the ESC byte (`0x1B`), so begin it with `ESC @` (`1B 40`).
 
@@ -241,7 +241,7 @@ To open the drawer without printing, for a float count or a no-sale, send the tw
 | Template receipt is empty or missing lines | Order was created without `orderLines` | Send lines on the create order call; they cannot be added after the fact |
 | Receipt prints on the wrong device | `terminalId` omitted, so it defaulted to the terminal that took the payment | Pass the `terminalId` of the printer you want |
 | Template changes do not show | A more specific level overrides yours | Check for a merchant or store template overriding the partner default |
-| `PR_0006` on the ESC/POS path | A command outside the contract, or non-UTF-8 text | The message names the byte offset. See the [ESC/POS Printing](/developers/guides/escpos-printing) error table |
+| `PR_0006` on the ESC/POS path | A command outside the contract, or non-UTF-8 text | The message names the byte offset. See the [ESC/POS Printing](/developers/guides/escpos-printing/) error table |
 | Cash drawer does not open, but the receipt prints | Drawer wired to the other pin, cable in the wrong port, drawer-kick bytes missing, or `codePages` sent | Send both pulses (`1B 70 00 19 FA 1B 70 01 19 FA`), use the drawer port, and leave `codePages` out for the FinPrinter. See [Open a cash drawer](#open-a-cash-drawer) |
 
 ## API Quick Reference
@@ -254,4 +254,4 @@ To open the drawer without printing, for a float count or a no-sale, send the tw
 | Set a merchant's default template | PATCH | `/merchants/{merchantId}/configuration` |
 | Register a FinPrinter | POST | `/merchants/{merchantId}/stores/{storeId}/devices` |
 
-For the full endpoint reference, see the [Receipts API](https://developers.surfboardpayments.com/api/receipts) documentation. For the ESC/POS contract itself, see [ESC/POS Printing](/developers/guides/escpos-printing); for email, links and fiscal receipt data, see [Receipts](/developers/guides/receipts).
+For the full endpoint reference, see the [Receipts API](https://developers.surfboardpayments.com/api/receipts) documentation. For the ESC/POS contract itself, see [ESC/POS Printing](/developers/guides/escpos-printing/); for email, links and fiscal receipt data, see [Receipts](/developers/guides/receipts/).

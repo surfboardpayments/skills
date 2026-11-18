@@ -1,8 +1,8 @@
 ---
 name: surfboard-auth
-description: "Surfboard Payments credentials and authentication: getting Demo API keys from the developer console, the API-KEY/API-SECRET/MERCHANT-ID header model, client auth tokens for browsers and mobile apps, and where each scheme is and is not allowed. Use when setting up Surfboard credentials, debugging a 401 or 403, or calling the API from client-side code."
+description: "Surfboard Payments credentials and authentication: getting Demo API keys from the integration portal, the API-KEY/API-SECRET/MERCHANT-ID header model, client auth tokens for browsers and mobile apps, and where each scheme is and is not allowed. Use when setting up Surfboard credentials, debugging a 401 or 403, or calling the API from client-side code."
 metadata:
-  pack-version: "a9f4a5b0b2b6"
+  pack-version: "b6d3ec4e8bf2"
 ---
 
 # Surfboard authentication
@@ -11,14 +11,18 @@ Read `surfboard-payments` first for the shared conventions.
 
 ## Getting credentials
 
-Credentials are issued through the Developer Portal. A human does this once:
+Credentials are issued through the integration portal. A human does this once:
 
-1. <https://developers.surfboardpayments.com/sign-up> to create a developer account
-2. <https://developers.surfboardpayments.com/console/api-keys> to copy the **Demo** key,
-   secret, merchant ID, and base URL
+1. <https://integrate.surfboardpayments.com/signup> to create a developer account, or
+   to sign in with one
+2. Create a **Demo** key on the page, and choose "Connect Demo environment" to see the
+   merchant, store, and terminal IDs
+3. "Copy all for .env" for the key, the base URL, and those IDs together
 
 Demo credentials are issued immediately on signup. Live credentials come only after
-certification (`surfboard-go-live`).
+certification (`surfboard-go-live`), and are issued in the developer console,
+<https://developers.surfboardpayments.com/console/api-keys>, which lists the Demo keys
+too. It is the same account.
 
 Ask the user to write the values into `.env` themselves. Do not ask for them in chat,
 do not echo them, do not commit them.
@@ -99,7 +103,7 @@ Administrative work always needs the full key and secret, from your backend.
 | 401 after it worked | Base URL and credentials are from different environments |
 | 403 with valid keys | `MERCHANT-ID` header does not match `:merchantId` in the path |
 | 403 from the browser | Using key/secret client-side instead of a client token |
-| 404 on a partner route | Sending `MERCHANT-ID` on a partner-level endpoint |
+| 404 on any route | The path shape is wrong (for example `/merchants/:merchantId/orders`); an unknown id is a 2xx with `"status": "ERROR"` instead |
 
 Check `status` in the body, not just the HTTP code.
 

@@ -23,6 +23,8 @@ There are two moments to order from, and they are different calls:
 
 Returns are one call plus a waybill, and everything in flight reports its progress through a single webhook.
 
+Terminals supplied under a P2PE agreement always ship directly to the merchant's store. They are kept in Surfboard-designated secure storage until dispatch and can't be delivered to, or stocked by, a partner.
+
 ## Prerequisites
 
 1. A partner account with API credentials and your `partnerId`
@@ -31,7 +33,7 @@ Returns are one call plus a waybill, and everything in flight reports its progre
 
 ## Ordering During Onboarding
 
-Terminals can be chosen as part of merchant creation, which is the tidiest path: the merchant signs up and orders hardware in the same sitting. It is configured with control fields on [Create Merchant](/developers/guides/merchant-onboarding).
+Terminals can be chosen as part of merchant creation, which is the tidiest path: the merchant signs up and orders hardware in the same sitting. It is configured with control fields on [Create Merchant](/developers/guides/merchant-onboarding/).
 
 ```json
 POST /partners/:partnerId/merchants
@@ -152,7 +154,7 @@ Every change of state raises `logistics.orderupdate` against your webhook endpoi
 | `ORDER_SHIPPED` | In transit. Carries `trackingUrl` and `packageDetails`. |
 | `ORDER_COMPLETED` | Delivered and fulfilled. |
 
-`trackingUrl` and `packageDetails` appear only on `ORDER_SHIPPED`. Store the serials from `packageDetails` as they arrive: that is the link between a shipment and the physical device a merchant will later register, and the fastest way to answer "which terminal did we send to which store". Registration itself is covered in [Device Registration](/developers/guides/device-registration).
+`trackingUrl` and `packageDetails` appear only on `ORDER_SHIPPED`. Store the serials from `packageDetails` as they arrive: that is the link between a shipment and the physical device a merchant will later register, and the fastest way to answer "which terminal did we send to which store". Registration itself is covered in [Device Registration](/developers/guides/device-registration/).
 
 Acknowledge with `200 OK` within 10 seconds, and deduplicate on `metadata.eventId`. Failed deliveries are retried twice, after 5 and 10 minutes.
 
@@ -188,7 +190,7 @@ List what is in flight:
 GET /partners/:partnerId/logistics/return
 ```
 
-> **Deactivating a store?** A store cannot be deactivated while terminals are registered to it. Move them to another store under the same merchant, or return them first. See [Store Management](/developers/guides/store-management).
+> **Deactivating a store?** A store cannot be deactivated while terminals are registered to it. Move them to another store under the same merchant, or return them first. See [Store Management](/developers/guides/store-management/).
 
 ## What to Build Around This
 
@@ -202,6 +204,6 @@ Three things repay the effort:
 
 - [Logistics API](https://developers.surfboardpayments.com/api/logistics)
 - [Logistics Order Update webhook](https://developers.surfboardpayments.com/references/webhooks)
-- [Merchant Onboarding](/developers/guides/merchant-onboarding)
-- [Device Registration](/developers/guides/device-registration)
-- [Terminal & Device Management](/developers/guides/terminal-device-management)
+- [Merchant Onboarding](/developers/guides/merchant-onboarding/)
+- [Device Registration](/developers/guides/device-registration/)
+- [Terminal & Device Management](/developers/guides/terminal-device-management/)

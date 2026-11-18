@@ -23,7 +23,7 @@ A full refund in Surfboard is processed by creating a **new order** with negativ
 | **Order error** | Wrong order fulfilled entirely |
 | **Post-settlement reversal** | Payment already settled, void no longer possible |
 
-> If the payment hasn't settled yet (same day, before 23:00 UTC), consider using [Void a Payment](/developers/guides/void-a-payment) instead -- it's faster and avoids refund processing fees.
+> If the payment hasn't settled yet (same day, before 23:00 UTC), consider using [Void a Payment](/developers/guides/void-a-payment/) instead -- it's faster and avoids refund processing fees.
 
 ## Step 1: Create a Refund Order
 
@@ -114,6 +114,7 @@ Set `paymentMethod` to either the method the customer originally paid with, or `
 | CARD | `CARD_NP` (recommended) or `CARD` |
 | KLARNA | `KLARNA` |
 | SWISH | `SWISH` |
+| NSWISH (Swish online) | `NSWISH`, with `purchasePaymentId` |
 | Other digital methods | Same as original |
 
 For card refunds, the two card methods behave differently:
@@ -145,7 +146,7 @@ Pass refund metadata through `refundProcessingParams` inside `initiatePaymentsOp
 
 | Parameter | Required | Description |
 |-----------|----------|-------------|
-| `purchasePaymentId` | No | The `paymentId` of the **original purchase** (returned when the original order was created). This is the payment-level reference, distinct from the `purchaseOrderId` you set on each line item. |
+| `purchasePaymentId` | No | The `paymentId` of the **original purchase** (returned when the original order was created). This is the payment-level reference, distinct from the `purchaseOrderId` you set on each line item. Always include it when refunding an `NSWISH` payment. |
 | `refundReason` | No | Why the refund is being issued. See the allowed values below. |
 | `otherReason` | Conditional | Free-text explanation. **Required when `refundReason` is `OTHER`.** |
 
@@ -184,7 +185,7 @@ Verify the refund completed:
 GET /orders/:orderId/status
 ```
 
-The order status will show `PAYMENT_COMPLETED` once the refund is processed. You can also track refund status via [webhooks](/developers/guides/webhooks-notifications).
+The order status will show `PAYMENT_COMPLETED` once the refund is processed. You can also track refund status via [webhooks](/developers/guides/webhooks-notifications/).
 
 ## Adjustments in Refunds
 
@@ -230,6 +231,6 @@ You can also process refunds through the UI:
 ## Reference
 
 - [Create Order API](https://developers.surfboardpayments.com/api/orders)
-- [Partial Refund](/developers/guides/partial-refund)
-- [Payment Lifecycle](/developers/guides/payment-lifecycle)
-- [Developer Portal](https://developers.surfboardpayments.com/)
+- [Partial Refund](/developers/guides/partial-refund/)
+- [Payment Lifecycle](/developers/guides/payment-lifecycle/)
+- [Integration portal](https://integrate.surfboardpayments.com/)

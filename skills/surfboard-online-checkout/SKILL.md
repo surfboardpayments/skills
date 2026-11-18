@@ -2,7 +2,7 @@
 name: surfboard-online-checkout
 description: "Add online payments with Surfboard Payments: hosted Payment Page, self-hosted checkout, and shareable payment links. Covers redirect and return handling, order creation for web, payment methods per market, and checkout branding. Use for e-commerce checkout, a pay-by-link flow, or taking a card payment on a website."
 metadata:
-  pack-version: "a9f4a5b0b2b6"
+  pack-version: "b6d3ec4e8bf2"
 ---
 
 # Online checkout

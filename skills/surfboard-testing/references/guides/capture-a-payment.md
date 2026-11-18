@@ -110,7 +110,7 @@ When the customer pays, you receive `order.paymentinitiated`, sometimes `order.p
 
 Surfboard does not limit how long after authorization you can capture. The limit is set by the card scheme and acquirer, typically around **7 days** for cards, so capture well within that window.
 
-Surfboard never captures or voids an authorization automatically. If you neither capture nor [void](/developers/guides/payment-lifecycle#void-a-payment) it, the authorization lapses at the issuer and the funds are released back to the customer. Void authorizations you no longer intend to capture rather than letting them lapse.
+Surfboard never captures or voids an authorization automatically. If you neither capture nor [void](/developers/guides/payment-lifecycle/#void-a-payment) it, the authorization lapses at the issuer and the funds are released back to the customer. Void authorizations you no longer intend to capture rather than letting them lapse.
 
 ### Pre-Authorization Mode
 
@@ -134,7 +134,7 @@ When the final amount isn't known at checkout, for example a hotel stay where th
 
 **Changing the amount:** once the customer has paid, the order itself can't be edited (Update Order answers `OR_0041`). Send the final amount with the capture instead, as shown in Step 2.
 
-**Not charging at all:** [void the payment](/developers/guides/payment-lifecycle#void-a-payment) before you capture. That releases the whole hold.
+**Not charging at all:** [void the payment](/developers/guides/payment-lifecycle/#void-a-payment) before you capture. That releases the whole hold.
 
 ## Step 2: Capture the Payment
 
@@ -199,5 +199,5 @@ GET /payments/:paymentId/capture
 
 - [Create Order API](https://developers.surfboardpayments.com/api/orders)
 - [Payments API](https://developers.surfboardpayments.com/api/payments)
-- [Create an Order](/developers/guides/create-an-order)
-- [Payment Lifecycle](/developers/guides/payment-lifecycle)
+- [Create an Order](/developers/guides/create-an-order/)
+- [Payment Lifecycle](/developers/guides/payment-lifecycle/)

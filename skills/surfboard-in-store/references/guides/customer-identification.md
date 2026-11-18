@@ -33,7 +33,7 @@ The window between steps 3 and 5 is where your business logic lives, and it is s
 ## Prerequisites
 
 1. A registered Android terminal under an onboarded merchant and store
-2. A webhook endpoint subscribed to `order.customer.identify` — see [Webhooks](/developers/guides/webhooks-notifications)
+2. A webhook endpoint subscribed to `order.customer.identify` — see [Webhooks](/developers/guides/webhooks-notifications/)
 3. Somewhere to store card tokens against your customers
 
 ## Step 1: Create the Order
@@ -101,7 +101,7 @@ You can also pull the same card data from the order rather than waiting for the 
 GET /orders/:orderId/tokens
 ```
 
-See [Tokens](/developers/guides/tokens) for what comes back.
+See [Tokens](/developers/guides/tokens/) for what comes back.
 
 ### Matching the Token
 
@@ -207,6 +207,6 @@ The card token turns anonymous footfall into a recognisable customer, so it dese
 - [Order Customer Identity webhook](https://developers.surfboardpayments.com/references/webhooks)
 - [Update Order API](https://developers.surfboardpayments.com/api/orders)
 - [Payments API](https://developers.surfboardpayments.com/api/payments)
-- [Tokens](/developers/guides/tokens)
-- [Webhooks](/developers/guides/webhooks-notifications)
-- [Create an Order](/developers/guides/create-an-order)
+- [Tokens](/developers/guides/tokens/)
+- [Webhooks](/developers/guides/webhooks-notifications/)
+- [Create an Order](/developers/guides/create-an-order/)

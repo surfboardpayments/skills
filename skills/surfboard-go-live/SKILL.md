@@ -2,7 +2,7 @@
 name: surfboard-go-live
 description: "Move a Surfboard Payments integration from Demo to Live: certification, production credentials, PCI scope, supported markets and payment methods, settlements and reporting, monitoring, and support escalation. Use when an integration is built and verified in Demo and the user is preparing for real transactions."
 metadata:
-  pack-version: "a9f4a5b0b2b6"
+  pack-version: "b6d3ec4e8bf2"
 ---
 
 # Going live
@@ -23,7 +23,10 @@ Your job is to get the integration ready and hand over a clear list.
 4. Update the base URL from Demo to Live
 5. Start accepting live payments
 
-<https://developers.surfboardpayments.com>
+The last step of the user's path in the integration portal,
+<https://integrate.surfboardpayments.com>, shows where the contract and the
+certification stand. The review is requested under Go live in the developer console,
+<https://developers.surfboardpayments.com>, and Live keys are issued there.
 
 ## Readiness checklist
 

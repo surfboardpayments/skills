@@ -2,7 +2,7 @@
 name: surfboard-payments
 description: "Router and shared conventions for integrating Surfboard Payments: in-store card terminals, Tap to Pay, hosted online checkout, recurring billing, and merchant onboarding. Use whenever the task mentions Surfboard, surfpay, SurfTouch, SurfPad, SurfPrint, SurfMini, CheckoutX, or asks to add card payments, a payment terminal, or a checkout to a codebase. Start here before any other surfboard-* skill."
 metadata:
-  pack-version: "a9f4a5b0b2b6"
+  pack-version: "b6d3ec4e8bf2"
 ---
 
 # Surfboard Payments
@@ -35,16 +35,45 @@ Surfboard, before relying on anything here or in `references/`:
 
 It is one small request, so do it every session rather than on a schedule.
 
+## Ask before you change anything
+
+Having this skill loaded is not a request to integrate. Unless the user has already
+asked for payments in this codebase, ask first, in one message, and use a
+multiple-choice question tool if you have one:
+
+1. Do they want Surfboard payments added to this codebase? Name the repository. If it
+   does not look like where payments would go, say so and ask which project they mean.
+2. What are they building? Look at the code and lead with your best guess from "Which
+   skill to use" below, so they can confirm it rather than choose.
+3. Do they have a Surfboard developer account with a Demo key?
+
+Once they have said yes, the work is yours: do it, and do not hand it back as a list
+of commands for the user to run.
+
 ## Before you can call anything
 
 The API needs credentials that only a human can issue, because getting them means
-accepting terms on behalf of a company. That happens in the Developer Portal.
+accepting terms on behalf of a company. That happens in the integration portal,
+<https://integrate.surfboardpayments.com>.
 
 If the user does not have credentials yet, stop, ask them to do this, and wait:
 
-1. Create a developer account at <https://developers.surfboardpayments.com/sign-up>
-2. Open the console at <https://developers.surfboardpayments.com/console/api-keys>
-3. Copy the **Demo** API key and secret, and the merchant ID
+1. Open <https://integrate.surfboardpayments.com/signup?for=online-hosted>, with the
+   ids for what they are building after `for=` (the table under "Which skill to use").
+   The portal then opens on their path instead of asking again. Someone who already
+   has a developer account signs in on the same page.
+2. Create a **Demo** key on the page. It is issued immediately.
+3. Choose "Connect Demo environment" to see the merchant, store, and terminal IDs, then
+   "Copy all for .env" for the key, the base URL, and those IDs together.
+
+It is the same account as the developer console at
+<https://developers.surfboardpayments.com>, which is where Live keys, the go-live
+review, and app uploads are. A key made in the portal is listed there too.
+
+You can read the same path the user sees, as Markdown and without an account:
+<https://integrate.surfboardpayments.com/plan.md?for=online-hosted>. It is the steps
+for that combination in order, with who does each one. Fetch it once you know what is
+being built. If it and a skill disagree, tell the user and settle it with a Demo call.
 
 Then have them put the values in `.env` themselves. Do not ask them to paste
 credentials into the chat, and do not read them back:
@@ -61,10 +90,10 @@ SURFBOARD_PARTNER_ID=       # partner-scoped endpoints only: stores, onboarding,
 
 If you write a `.env.example` as a template, **leave every value empty and keep it
 that way.** It is tracked. Real values go only in `.env`. Say out loud that you have
-created it, because the common accident is the user pasting keys from the console
+created it, because the common accident is the user pasting keys from the portal
 into whichever file is open, and that file is usually the template.
 
-The base URL is shown in the console alongside the keys and differs between Demo and
+The base URL is shown alongside the key and differs between Demo and
 Live. It is not published in the documentation, so read it from configuration. Never
 hard-code a host you inferred.
 
@@ -75,12 +104,13 @@ See `references/environments.md` for what Demo can and cannot do.
 Work out the integration shape from the codebase before asking. A POS or till app is
 in-store; an e-commerce checkout is online; a subscription product is server-to-server.
 
-| The user wants | Skill |
-|---|---|
-| Card payments on a physical terminal, or Tap to Pay | `surfboard-in-store` |
-| A checkout page, payment links, hosted or self-hosted | `surfboard-online-checkout` |
-| Subscriptions, recurring charges, saved cards, B2B invoices | `surfboard-server-to-server` |
-| To onboard merchants as a platform or partner | `surfboard-onboarding` |
+| The user wants | Skill | Portal id |
+|---|---|---|
+| Card payments on a physical terminal, or Tap to Pay | `surfboard-in-store` | `in-store`, `softpos` |
+| A checkout page, payment links, hosted or self-hosted | `surfboard-online-checkout` | `online-hosted`, `online-selfhosted`, `paylink` |
+| Subscriptions, recurring charges, saved cards, B2B invoices | `surfboard-server-to-server` | `recurring` |
+| To onboard merchants as a platform or partner | `surfboard-onboarding` | `onboarding` |
+| Their own Android app on a Surfboard terminal | `surfboard-terminals` | `terminal-app` |
 | To register, configure, or ship terminals | `surfboard-terminals` |
 | Event notifications, callbacks, order status pushes | `surfboard-webhooks` |
 | Credentials, headers, browser or mobile tokens | `surfboard-auth` |
@@ -129,6 +159,17 @@ wording, which is not a contract. `data` is absent or null on errors.
 201 as success and then propagate that 201 into its own error path. Read the envelope
 first, and map any 2xx-carrying-an-error onto a server-side failure of your own.
 
+### Decode for `null`, and ignore what you do not know
+
+A field the reference does not mark as required comes back as `null` when it is
+unset, not left out: a terminal that was never linked has `"linkedTerminalId": null`,
+a merchant without a second address line has `"addressLine2": null`. Responses also
+gain fields over time. So decode every non-required field as nullable, and let unknown
+fields through. A strict decoder fails the whole response over one such field; this
+is the most common way a generated client breaks on its first real call. The Carbon
+OpenAPI document encodes both rules, and its success responses also allow the error
+envelope, so a client generated from it has to check `status` before reading `data`.
+
 ### Orders, payments, and receipts are not merchant-scoped
 
 The merchant travels in the `MERCHANT-ID` **header**, never in the path.
@@ -139,8 +180,11 @@ GET    /orders/:orderId/status      correct
 POST   /merchants/:merchantId/orders   404, and the 404 does not say why
 ```
 
-Only partner-level endpoints put an ID in the path, and they use `partnerId`:
-stores, merchant onboarding, service providers, billing plans, logistics, branding, client auth tokens.
+Partner-level endpoints put the partner in the path (`/partners/:partnerId/...`):
+merchant onboarding, service providers, billing plans, logistics, client auth tokens.
+Merchant configuration endpoints carry the merchant in the path as well
+(`/merchants/:merchantId/terminals`, `/merchants/:merchantId/stores/:storeId/tips`,
+branding), and still take the `MERCHANT-ID` header.
 72 of the 237 endpoints are partner-scoped; none of them are orders, payments, or
 receipts.
 

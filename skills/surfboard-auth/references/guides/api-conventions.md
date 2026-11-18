@@ -38,7 +38,7 @@ Three other schemes exist for cases where a long-lived secret cannot travel:
 | API token | `X-Surfboard-Api-Token` | Scoped machine access |
 | Nonce | `X-Surfboard-Nonce` | Self-hosted checkout pages, issued per order |
 
-Anything running in a browser or on a customer's phone uses a short-lived token instead of your key and secret. That is what [Client Auth Tokens](/developers/guides/client-auth-tokens) is for, and it is not optional: a key in client code is a key in public.
+Anything running in a browser or on a customer's phone uses a short-lived token instead of your key and secret. That is what [Client Auth Tokens](/developers/guides/client-auth-tokens/) is for, and it is not optional: a key in client code is a key in public.
 
 ## The Response Envelope
 
@@ -55,8 +55,10 @@ Every response is the same three fields.
 | Field | Notes |
 |-------|-------|
 | `status` | `SUCCESS` or `ERROR`. Check this, not just the HTTP code. |
-| `data` | The payload. An object for a single resource, an array for a list. Absent or `null` on errors. |
+| `data` | The payload. An object for a single resource, an array for a list. Absent or `null` on errors, and `null` on some successful calls with nothing to return. |
 | `message` | Human-readable. Log it; do not branch on it — the wording is not a contract. |
+
+**Unset fields are `null`, not missing.** A field the reference does not mark as required can come back as `null` (a terminal that was never linked has `"linkedTerminalId": null`). Decode such fields as nullable, and ignore fields you do not recognise: responses gain fields over time. The [OpenAPI document](/openapi/carbon.json) encodes both rules.
 
 Errors keep the envelope and add a code where one applies:
 
@@ -67,15 +69,18 @@ Errors keep the envelope and add a code where one applies:
 }
 ```
 
+**Most errors arrive with a success status code.** A missing field, an unknown id or an unreachable terminal comes back with the endpoint's usual `200` or `201` and `"status": "ERROR"`. For example, `POST /orders` without `terminal$id` answers `201` with `"message": "Mandatory Properties missing terminal$id"`, and `GET /orders/{orderId}` for an unknown order answers `200` with `"OR_0016: Order not found"`. Read `status` on every response before using `data`; never treat a 2xx as success on its own.
+
+The HTTP status code itself is meaningful in these cases:
+
 | HTTP | Meaning |
 |------|---------|
-| 400 | The body is malformed or a required field is missing. |
 | 401 | Credentials are wrong, missing, or not valid for this account. |
 | 403 | Authenticated, but not permitted to do this. |
-| 404 | An identifier in the path does not resolve. |
+| 408 | The request timed out upstream. Retry with backoff. |
 | 500 | Server-side. Retry with backoff; if it persists, contact support. |
 
-Order creation adds its own codes in the `OR_*`, `PS_*`, `GC_*` and `SP_*` families — see [Create Order Error Codes](/developers/guides/create-order-error-codes).
+Order creation adds its own codes in the `OR_*`, `PS_*`, `GC_*` and `SP_*` families — see [Create Order Error Codes](/developers/guides/create-order-error-codes/).
 
 ## Amounts and Currencies
 
@@ -162,15 +167,15 @@ So the loop terminates on an empty `data`, or on having seen `x-total-items` row
 
 | Environment | Terminals | Cards |
 |-------------|-----------|-------|
-| **Demo** | Payment page mode | Test cards only |
+| **Demo** | Payment Page and Self-Hosted Checkout | Test cards only |
 | **Live** | All terminal types | Real cards, settled, paid out |
 
 Demo credentials come from the Developer Portal as soon as you sign up. Live credentials are issued separately, after Surfboard certifies the integration, and the base URL changes with them — so keep the host, the key and the secret in configuration rather than in code.
 
-**Where the base URL comes from.** It is issued to you rather than published here, and it is not the same string for every account, so there is no host to copy out of this guide. Find it in the Developer Portal console, shown next to the keys it belongs with:
+**Where the base URL comes from.** It is issued to you rather than published here, and it is not the same string for every account, so there is no host to copy out of this guide. Creating a Demo key in the integration portal gives it to you together with the key and secret it belongs with:
 
 ```
-https://developers.surfboardpayments.com/console/api-keys
+https://integrate.surfboardpayments.com/
 ```
 
 Read it from configuration — the `YOUR_API_URL` placeholder in the examples below stands for exactly this value, and the conventional environment variable is `SURFBOARD_API_URL`:
@@ -190,7 +195,7 @@ Never mix environments inside one flow: a test merchant with a production backen
 
 ## Reference
 
-- [Client Auth Tokens](/developers/guides/client-auth-tokens)
-- [Create Order Error Codes](/developers/guides/create-order-error-codes)
-- [Transactions and Reports](/developers/guides/transactions-and-reports)
-- [Developer Portal](https://developers.surfboardpayments.com/)
+- [Client Auth Tokens](/developers/guides/client-auth-tokens/)
+- [Create Order Error Codes](/developers/guides/create-order-error-codes/)
+- [Transactions and Reports](/developers/guides/transactions-and-reports/)
+- [Integration portal](https://integrate.surfboardpayments.com/)

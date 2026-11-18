@@ -174,7 +174,7 @@ Once the terminal is registered, process payments through app switch.
 
 ### Step 1: Create an Order via API
 
-Create an order using the [Create Order API](/developers/guides/create-an-order) with the `terminalId` from registration. The response includes a `paymentId` and an `interAppJWT`:
+Create an order using the [Create Order API](/developers/guides/create-an-order/) with the `terminalId` from registration. The response includes a `paymentId` and an `interAppJWT`:
 
 ```json
 POST /orders
@@ -418,7 +418,7 @@ The redirect URL and app switch mechanics are identical to the payment flow.
 ## Reference
 
 - [Terminals API](https://developers.surfboardpayments.com/api/terminals)
-- [Create an Order](/developers/guides/create-an-order)
-- [Tap to Pay on iPhone](/developers/guides/tap-to-pay-iphone)
-- [NFC Tag Reading](/developers/guides/nfc-tag-reading)
-- [Developer Portal](https://developers.surfboardpayments.com/)
+- [Create an Order](/developers/guides/create-an-order/)
+- [Tap to Pay on iPhone](/developers/guides/tap-to-pay-iphone/)
+- [NFC Tag Reading](/developers/guides/nfc-tag-reading/)
+- [Integration portal](https://integrate.surfboardpayments.com/)

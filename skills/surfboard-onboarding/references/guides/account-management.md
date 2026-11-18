@@ -62,7 +62,7 @@ POST /partners/{partnerId}/accounts
 
 Service providers are third-party entities that participate in transaction processing, revenue sharing, or value-added services. Partners register them, track onboarding, and query them at both partner and merchant level.
 
-For the full split-payout flow, including linking a service provider to a merchant and setting the share on an order, see [Service Providers & Split Payouts](/developers/guides/service-providers).
+For the full split-payout flow, including linking a service provider to a merchant and setting the share on an order, see [Service Providers & Split Payouts](/developers/guides/service-providers/).
 
 ### Register a Service Provider
 

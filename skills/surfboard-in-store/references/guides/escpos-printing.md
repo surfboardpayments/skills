@@ -16,7 +16,7 @@ Surfboard is standardising ESC/POS printing across every payment terminal. You o
 
 The opt-in is deliberately small. The work is in the rules the contract enforces, which this guide covers: UTF-8 text, a fixed set of supported commands, and line widths that depend on the text size you select.
 
-> **Note:** This guide covers the ESC/POS contract specifically. If you have not yet decided whether to render receipts yourself or let Surfboard print them from a template, start with [Receipt Printing](/developers/guides/receipt-printing), which compares the two paths and covers the printers, including the FinPrinter. For email, hosted links and fiscal receipt data, see the [Receipts](/developers/guides/receipts) guide.
+> **Note:** This guide covers the ESC/POS contract specifically. If you have not yet decided whether to render receipts yourself or let Surfboard print them from a template, start with [Receipt Printing](/developers/guides/receipt-printing/), which compares the two paths and covers the printers, including the FinPrinter. For email, hosted links and fiscal receipt data, see the [Receipts](/developers/guides/receipts/) guide.
 
 ## Prerequisites
 
@@ -24,7 +24,7 @@ The opt-in is deliberately small. The work is in the rules the contract enforces
 - A registered [terminal with a built-in printer](/products/?requirements=printer)
 - The terminal's `terminalId`
 
-> **Note:** This contract is for payment terminals with a built-in printer. The [FinPrinter](/products/fins/finprinter) takes ESC/POS on the same endpoint, but without `codePages`, and can also open a cash drawer. See [ESC/POS on the FinPrinter](/developers/guides/receipt-printing#escpos-on-the-finprinter) and [Open a cash drawer](/developers/guides/receipt-printing#open-a-cash-drawer).
+> **Note:** This contract is for payment terminals with a built-in printer. The [FinPrinter](/products/fins/finprinter/) takes ESC/POS on the same endpoint, but without `codePages`, and can also open a cash drawer. See [ESC/POS on the FinPrinter](/developers/guides/receipt-printing/#escpos-on-the-finprinter) and [Open a cash drawer](/developers/guides/receipt-printing/#open-a-cash-drawer).
 
 ## Opting in
 
@@ -293,4 +293,4 @@ Handle `ESC *` images, `GS ( k` QR blocks, and `GS V` cuts before this runs, or 
 |-----------|--------|----------|
 | Print custom ESC/POS receipt | PUT | `/receipts/{terminalId}/escpos` |
 
-For the full endpoint reference, see the [Receipts API](https://developers.surfboardpayments.com/api/receipts) documentation. To print from a Surfboard template instead of rendering the receipt yourself, see [Receipt Printing](/developers/guides/receipt-printing). For the other receipt delivery methods, see the [Receipts](/developers/guides/receipts) guide.
+For the full endpoint reference, see the [Receipts API](https://developers.surfboardpayments.com/api/receipts) documentation. To print from a Surfboard template instead of rendering the receipt yourself, see [Receipt Printing](/developers/guides/receipt-printing/). For the other receipt delivery methods, see the [Receipts](/developers/guides/receipts/) guide.

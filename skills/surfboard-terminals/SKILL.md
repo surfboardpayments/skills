@@ -2,7 +2,7 @@
 name: surfboard-terminals
 description: "Register, configure, and manage Surfboard payment terminals: device registration codes, linking and delinking stores, hierarchical configuration, multi-merchant terminals, ordering and returning hardware, and the Android SoftPOS and Tap to Pay on iPhone SDKs. Use when provisioning devices, changing terminal settings, or integrating a SoftPOS SDK."
 metadata:
-  pack-version: "a9f4a5b0b2b6"
+  pack-version: "b6d3ec4e8bf2"
 ---
 
 # Terminals and devices

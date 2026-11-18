@@ -14,7 +14,7 @@ generated: true
 
 This reference lists the error codes returned by the create order and initiate payment flows. Most create order calls also initiate a payment in the same request (via `controlFunctions.initiatePaymentsOptions`), so errors from either step can surface on the same endpoint.
 
-See the [Create an Order](/developers/guides/create-an-order) guide for request/response shape and the [Payment Lifecycle](/developers/guides/payment-lifecycle) guide for status semantics.
+See the [Create an Order](/developers/guides/create-an-order/) guide for request/response shape and the [Payment Lifecycle](/developers/guides/payment-lifecycle/) guide for status semantics.
 
 ## Error Response Shape
 
@@ -52,8 +52,8 @@ P_0001: Input data validation failed. <reason>
 
 | Message fragment | Cause | Fix |
 |---|---|---|
-| `Invalid item price for item id <id>` | `amount.total` sent as the line total | `total` is the **unit** price. See [Create an Order](/developers/guides/create-an-order) |
-| `Invalid total order price` | Tax added on top of the price | Prices are tax-inclusive; `total` must equal `regular`. See [API Conventions](/developers/guides/api-conventions) |
+| `Invalid item price for item id <id>` | `amount.total` sent as the line total | `total` is the **unit** price. See [Create an Order](/developers/guides/create-an-order/) |
+| `Invalid total order price` | Tax added on top of the price | Prices are tax-inclusive; `total` must equal `regular`. See [API Conventions](/developers/guides/api-conventions/) |
 | `Cannot read properties of undefined (reading 'vatValue')` | A line is missing `amount.tax` | Send a `tax` entry on every line, including zero-rated ones |
 
 The same underlying faults are also described by `OR_0023` and `OR_0037` below, which is what you get when the order reaches the Orders service before failing. Either code can carry the same message.
@@ -191,7 +191,7 @@ PS_0025: Terminal is not connected to server so unable to send transactions
 
 Re-run the terminal configure call and retry the payment. This can be done transparently -- no user interaction is required. It is most common on SoftPOS, where the consumer device can drop its server session between transactions.
 
-See [Interapp Integration](/developers/guides/interapp-integration) for the full recovery pattern.
+See [Interapp Integration](/developers/guides/interapp-integration/) for the full recovery pattern.
 
 ## Handling Patterns
 
@@ -202,8 +202,8 @@ See [Interapp Integration](/developers/guides/interapp-integration) for the full
 
 ## Reference
 
-- [Create an Order](/developers/guides/create-an-order)
-- [Payment Lifecycle](/developers/guides/payment-lifecycle)
-- [Interapp Integration](/developers/guides/interapp-integration) -- `PS_0025` recovery
+- [Create an Order](/developers/guides/create-an-order/)
+- [Payment Lifecycle](/developers/guides/payment-lifecycle/)
+- [Interapp Integration](/developers/guides/interapp-integration/) -- `PS_0025` recovery
 - [Create Order API](https://developers.surfboardpayments.com/api/orders)
 - [Payments API](https://developers.surfboardpayments.com/api/payments)

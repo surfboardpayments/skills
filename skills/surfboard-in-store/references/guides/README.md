@@ -1,6 +1,6 @@
 # surfboard-in-store: bundled guides
 
-Generated from https://www.surfboardpayments.com/api/ai/guides.json (48 guides, updated 2026-10-20).
+Generated from https://www.surfboardpayments.com/api/ai/guides.json (49 guides, updated 2026-11-17).
 Do not edit these by hand; edit the guide on the marketing site and re-run `npm run skills`.
 
 - [Create an Order](./create-an-order.md): Learn how to create orders with line items, tax, customer details, and control functions. The starting point for accepting payments with the Surfboard API.

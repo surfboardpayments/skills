@@ -377,7 +377,7 @@ func generateHMACSignature(certificate, message string) string {
 
 ## Related Guides
 
-- [Notification Subscriptions](/developers/guides/notification-subscriptions) -- Set up persistent email, Slack, and SFTP delivery for settlement reports and operational alerts.
+- [Notification Subscriptions](/developers/guides/notification-subscriptions/) -- Set up persistent email, Slack, and SFTP delivery for settlement reports and operational alerts.
 
 ## API Reference
 

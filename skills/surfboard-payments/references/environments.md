@@ -5,7 +5,7 @@ production, though people use those words in conversation.
 
 ## Demo
 
-Demo credentials are issued by the Developer Portal the moment an account is created.
+Demo credentials are issued by the integration portal the moment an account is created.
 No sales call, no ticket, no approval step.
 
 | | Demo |
@@ -13,7 +13,7 @@ No sales call, no ticket, no approval step.
 | Terminals | Payment page mode only |
 | Cards | Test cards |
 | Real cards | Voided automatically after 30 minutes. Never captured, never settled. |
-| Credentials | <https://developers.surfboardpayments.com/console/api-keys> |
+| Credentials | <https://integrate.surfboardpayments.com> |
 
 Demo is enough to build and verify an entire integration: create orders, initiate
 payments, poll status, receive webhooks, issue refunds. What it will not do is drive

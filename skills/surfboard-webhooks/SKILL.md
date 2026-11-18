@@ -2,7 +2,7 @@
 name: surfboard-webhooks
 description: "Receive and verify Surfboard Payments webhooks: notification subscriptions, the event catalog, signature verification, idempotency and replay handling, retries, and local tunnelling. Use when payment status must reach the backend without polling, or when debugging events that are missing, duplicated, or arriving out of order."
 metadata:
-  pack-version: "a9f4a5b0b2b6"
+  pack-version: "b6d3ec4e8bf2"
 ---
 
 # Webhooks

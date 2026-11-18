@@ -18,13 +18,13 @@ The flow has two stages: the customer completes an initial payment (which tokeni
 
 ## Prerequisites
 
-1. Create a developer account at the [Developer Portal](https://developers.surfboardpayments.com/sign-up)
+1. Create a developer account at the [integration portal](https://integrate.surfboardpayments.com/signup)
 2. Complete onboarding (merchant and store setup)
 3. Two terminal IDs:
    - A **PaymentPage** or **SelfHostedPage** terminal for the initial customer payment
    - A **MerchantInitiated** terminal for subsequent server-to-server payments
 
-An online store comes with both a **PaymentPage** and a **MerchantInitiated** terminal already provisioned, so for the default setup this is a fetch, not a registration — list the store's terminals and take the two IDs. Only **SelfHostedPage** needs [registering](/developers/guides/terminal-device-management), and only if you are collecting the first payment on your own page.
+An online store comes with both a **PaymentPage** and a **MerchantInitiated** terminal already provisioned, so for the default setup this is a fetch, not a registration — list the store's terminals and take the two IDs. Only **SelfHostedPage** needs [registering](/developers/guides/terminal-device-management/), and only if you are collecting the first payment on your own page.
 
 ## Stage 1: Initial Customer Payment
 
@@ -153,4 +153,4 @@ Post-payment operations (refunds, receipts, reporting) work the same way as othe
 - [Create Order API](https://developers.surfboardpayments.com/api/orders)
 - [Initiate Payment API](https://developers.surfboardpayments.com/api/payments)
 - [Token Management](https://developers.surfboardpayments.com/api/orders)
-- [Developer Portal](https://developers.surfboardpayments.com/)
+- [Integration portal](https://integrate.surfboardpayments.com/)

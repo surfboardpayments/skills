@@ -34,11 +34,11 @@ The same mechanism works for in-store and online orders and for every payment me
 
 ## Prerequisites
 
-1. A partner account with API credentials and your `partnerId` from the [Developer Portal](https://developers.surfboardpayments.com/)
-2. At least one onboarded merchant. See [Merchant Onboarding](/developers/guides/merchant-onboarding)
+1. A partner account with API credentials and your `partnerId` from the [integration portal](https://integrate.surfboardpayments.com/)
+2. At least one onboarded merchant. See [Merchant Onboarding](/developers/guides/merchant-onboarding/)
 3. Flow enabled on your partner account. Contact your Surfboard account manager if the service provider endpoints return `403`
 
-Service provider endpoints are partner-scoped. Send `API-KEY` and `API-SECRET`. The `MERCHANT-ID` header is optional on these calls and, when present, must match the merchant in the path. See [API Conventions](/developers/guides/api-conventions).
+Service provider endpoints are partner-scoped. Send `API-KEY` and `API-SECRET`. The `MERCHANT-ID` header is optional on these calls and, when present, must match the merchant in the path. See [API Conventions](/developers/guides/api-conventions/).
 
 ## Step 1: Onboard a Service Provider
 
@@ -190,7 +190,7 @@ GET /partners/{partnerId}/service-providers
 
 ## Step 2: Link the Service Provider to a Merchant
 
-A service provider can only be named on orders from merchants it is linked to. Naming an unlinked one fails order creation with `SP_0001` (see [Create Order Error Codes](/developers/guides/create-order-error-codes)). Company service providers are linked explicitly. Individuals are associated with the merchant given at onboarding.
+A service provider can only be named on orders from merchants it is linked to. Naming an unlinked one fails order creation with `SP_0001` (see [Create Order Error Codes](/developers/guides/create-order-error-codes/)). Company service providers are linked explicitly. Individuals are associated with the merchant given at onboarding.
 
 Link an onboarded service provider:
 
@@ -257,7 +257,7 @@ DELETE /partners/{partnerId}/merchants/{merchantId}/service-providers/unlink
 
 ### Linking at merchant creation
 
-If the service provider already exists when you onboard a new merchant, you can link it and set a standing share in the same call. Add `merchantConfig.serviceProvider` to the [Create Merchant](/developers/guides/merchant-onboarding) request:
+If the service provider already exists when you onboard a new merchant, you can link it and set a standing share in the same call. Add `merchantConfig.serviceProvider` to the [Create Merchant](/developers/guides/merchant-onboarding/) request:
 
 ```json
 {
@@ -286,7 +286,7 @@ The `amount` object has the same shape as on the order, described below. A share
 
 ### Partner Portal
 
-Both steps can also be done by hand. The Service Providers page in the [Partner Portal](/partner-portal/service-providers) creates applications and shows their status, and each merchant's Service Providers tab links and unlinks providers.
+Both steps can also be done by hand. The Service Providers page in the [Partner Portal](/partner-portal/service-providers/) creates applications and shows their status, and each merchant's Service Providers tab links and unlinks providers.
 
 ## Step 3: Set the Split on the Order
 
@@ -345,7 +345,7 @@ POST /orders
 | `amount.fixed` | string | No | Fixed amount in minor currency units, for example `"200"` for 2 SEK. |
 | `amount.adjustmentTypes` | array | No | Adjustment types the share is taken from, for example `["TIPS"]`. A tip added on the terminal is an adjustment on top of the order total, so it is not included unless listed here. |
 
-In the example above the service provider is the waiter serving table 12. The order total goes to the restaurant as usual. Whatever the guest adds as a tip on the terminal is an adjustment of type `TIPS`, and the entry routes it to the waiter, who is paid at settlement without the amount passing through the restaurant's books. See [Tips Configuration](/developers/guides/tips-configuration) for enabling tips on the terminal.
+In the example above the service provider is the waiter serving table 12. The order total goes to the restaurant as usual. Whatever the guest adds as a tip on the terminal is an adjustment of type `TIPS`, and the entry routes it to the waiter, who is paid at settlement without the amount passing through the restaurant's books. See [Tips Configuration](/developers/guides/tips-configuration/) for enabling tips on the terminal.
 
 `percentage` and `fixed` can be combined. A 3% commission plus a 2 SEK fee is `{ "percentage": "3", "fixed": "200" }`. The Create Order reference documents both as strings; the Update Order reference accepts numbers.
 
@@ -360,9 +360,9 @@ Several service providers on one order each get their own entry:
 
 ### What happens next
 
-Surfboard authorises and captures the payment as usual. When the payment completes, each share is recorded against the transaction. At settlement, the merchant is paid the order amount less the shares, and each service provider is paid its share to the bank account from its application. The split is visible in settlement reports, SFTP exports, and the order itself. Fetching the order returns `controlFunctions.serviceProviders` exactly as sent, so your reconciliation can read the split from the same place it was written. See [Settlements & Reporting](/developers/guides/settlements-reporting).
+Surfboard authorises and captures the payment as usual. When the payment completes, each share is recorded against the transaction. At settlement, the merchant is paid the order amount less the shares, and each service provider is paid its share to the bank account from its application. The split is visible in settlement reports, SFTP exports, and the order itself. Fetching the order returns `controlFunctions.serviceProviders` exactly as sent, so your reconciliation can read the split from the same place it was written. See [Settlements & Reporting](/developers/guides/settlements-reporting/).
 
-Refunds follow the money. A refund of a split order reverses the service provider's share in proportion, so you refund the order the same way as any other. See [Refund an Order](/developers/guides/refund-an-order).
+Refunds follow the money. A refund of a split order reverses the service provider's share in proportion, so you refund the order the same way as any other. See [Refund an Order](/developers/guides/refund-an-order/).
 
 ### Changing the split
 
@@ -410,5 +410,5 @@ The split can be changed with [Update Order](https://developers.surfboardpayment
 - [Service Providers API](https://developers.surfboardpayments.com/api/service-providers)
 - [Create Order API](https://developers.surfboardpayments.com/api/orders)
 - [Create Merchant API](https://developers.surfboardpayments.com/api/merchants)
-- [Surfboard Flow](/flow)
-- [Partner Portal: Service Providers](/partner-portal/service-providers)
+- [Surfboard Flow](/flow/)
+- [Partner Portal: Service Providers](/partner-portal/service-providers/)

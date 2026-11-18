@@ -14,7 +14,7 @@ generated: true
 
 Above a few hundred euros, a business buyer generally will not pay by card. Procurement expects an invoice on terms, approved by someone who was not in the room when the order was placed, and paid by bank transfer thirty days later. A checkout that only takes cards quietly loses that business.
 
-B2B invoicing in Surfboard is a payment method, not a separate product. It is the same [Create Order](/developers/guides/create-an-order) call against the same online terminal, with `paymentMethod` set to `B2BINV` and an `invoice` block that says how the invoice is delivered and when it falls due. Surfboard issues the document, distributes it as an e-invoice or by email, chases it with reminders if you ask, and gives the buyer bank details to settle against.
+B2B invoicing in Surfboard is a payment method, not a separate product. It is the same [Create Order](/developers/guides/create-an-order/) call against the same online terminal, with `paymentMethod` set to `B2BINV` and an `invoice` block that says how the invoice is delivered and when it falls due. Surfboard issues the document, distributes it as an e-invoice or by email, chases it with reminders if you ask, and gives the buyer bank details to settle against.
 
 What changes is the timing. A card payment moves money at checkout; an invoice raises a claim at checkout and moves money on the due date. Everything downstream — reconciliation, credit notes, reporting — follows from that.
 
@@ -22,8 +22,8 @@ What changes is the timing. A card payment moves money at checkout; an invoice r
 
 ## Prerequisites
 
-1. A developer account at the [Developer Portal](https://developers.surfboardpayments.com/sign-up)
-2. A merchant that has completed onboarding, with an approved online store — [Payment Page](/developers/guides/payment-page) covers store creation and domain verification
+1. A developer account at the [integration portal](https://integrate.surfboardpayments.com/signup)
+2. A merchant that has completed onboarding, with an approved online store — [Payment Page](/developers/guides/payment-page/) covers store creation and domain verification
 3. `b2binv` active on the merchant or the store
 4. The `terminalId` of the store's online terminal
 
@@ -44,7 +44,7 @@ You can also activate it from the Partner Portal or the Merchant Portal — the 
 POST /merchants/:merchantId/stores/:storeId/payment-methods
 ```
 
-See [Payment Methods](/developers/guides/payment-methods) for the full activation and deactivation flow. Until the method is active, the payment initiation inside Create Order will fail, so do this before you send the first invoice.
+See [Payment Methods](/developers/guides/payment-methods/) for the full activation and deactivation flow. Until the method is active, the payment initiation inside Create Order will fail, so do this before you send the first invoice.
 
 ## Step 2: Identify the Buyer
 
@@ -233,9 +233,9 @@ Order status works the same as for any other order:
 GET /orders/:orderId/status
 ```
 
-Subscribe to `order.paymentcompleted` and `order.paymentfailed` rather than polling on a timer — see [Webhooks](/developers/guides/webhooks-notifications) for subscriptions, retries and signature verification.
+Subscribe to `order.paymentcompleted` and `order.paymentfailed` rather than polling on a timer — see [Webhooks](/developers/guides/webhooks-notifications/) for subscriptions, retries and signature verification.
 
-The thing to hold on to is that an invoice settles on its own timetable. The order tells you the invoice was raised and where it stands; the money arriving is a separate event on the buyer's terms. Reconcile invoice revenue against [Settlements & Reporting](/developers/guides/settlements-reporting) rather than treating order creation as cash in the bank.
+The thing to hold on to is that an invoice settles on its own timetable. The order tells you the invoice was raised and where it stands; the money arriving is a separate event on the buyer's terms. Reconcile invoice revenue against [Settlements & Reporting](/developers/guides/settlements-reporting/) rather than treating order creation as cash in the bank.
 
 ## Crediting an Invoice
 
@@ -334,7 +334,7 @@ Key details:
 - `quantity` goes negative on every credited line. `amount.total` stays positive.
 - `purchaseOrderId` and `purchasePaymentId` both belong **on the line item**: the `orderId` and `paymentId` returned when the original invoice was created.
 - Repeat the `billing` address and the `invoice` block. The credit is its own addressed document and can be distributed differently from the original — `EMAIL` here, where the original went out as `EINVOICE`.
-- Credit only some of the lines and you have a partial credit. The mechanics are the same as [Partial Refund](/developers/guides/partial-refund).
+- Credit only some of the lines and you have a partial credit. The mechanics are the same as [Partial Refund](/developers/guides/partial-refund/).
 
 > **`OR_0035: Cannot refund from purchase order that is not completed. Status: PENDING`** means exactly what the two paths above describe — the invoice has not been paid, so there is nothing to refund. Cancel the order instead.
 
@@ -351,15 +351,15 @@ Failures come back as `status: "ERROR"` with an `OR_*` or `PS_*` code, and the o
 - **You refunded an invoice nobody paid.** `OR_0035` on a return order means the original is still `PENDING`. Cancel it instead.
 - **A credit line has no `purchaseOrderId`.** Every negative line must reference the order it credits, and carry the `purchasePaymentId` alongside it.
 
-[Create Order Error Codes](/developers/guides/create-order-error-codes) lists the full set, including the errors raised by the payment initiation that happens inside the same call.
+[Create Order Error Codes](/developers/guides/create-order-error-codes/) lists the full set, including the errors raised by the payment initiation that happens inside the same call.
 
 ## Next Steps
 
-- [Payment Methods](/developers/guides/payment-methods) — activating and deactivating `b2binv`
-- [Create an Order](/developers/guides/create-an-order) — line items, tax and control functions in full
-- [Refund an Order](/developers/guides/refund-an-order) — the card-side equivalent of a credit invoice
-- [Settlements & Reporting](/developers/guides/settlements-reporting) — reconciling what has actually been paid
-- [Payment Page](/developers/guides/payment-page) — the store and terminal setup this guide assumes
+- [Payment Methods](/developers/guides/payment-methods/) — activating and deactivating `b2binv`
+- [Create an Order](/developers/guides/create-an-order/) — line items, tax and control functions in full
+- [Refund an Order](/developers/guides/refund-an-order/) — the card-side equivalent of a credit invoice
+- [Settlements & Reporting](/developers/guides/settlements-reporting/) — reconciling what has actually been paid
+- [Payment Page](/developers/guides/payment-page/) — the store and terminal setup this guide assumes
 
 ## Reference
 

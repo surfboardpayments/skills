@@ -18,7 +18,7 @@ This guide walks you through the complete process from zero to accepting live in
 
 ## Step 1: Create a Developer Account
 
-Sign up at the [Surfboard Developer Portal](https://developers.surfboardpayments.com/sign-up) to get started. A developer account gives you:
+Sign up at the [integration portal](https://integrate.surfboardpayments.com/signup) to get started. A developer account gives you:
 
 - Access to the Console for managing your integration
 - A sandbox environment for building and testing
@@ -146,6 +146,6 @@ Set up webhook endpoints in the Console under your developer account settings.
 
 ## Reference
 
-- [Developer Portal](https://developers.surfboardpayments.com/)
+- [Integration portal](https://integrate.surfboardpayments.com/)
 - [Carbon API Documentation](https://developers.surfboardpayments.com/references/api/orders/create-order)
 - [Webhook Reference](https://developers.surfboardpayments.com/references/webhooks/merchants/application-completed)

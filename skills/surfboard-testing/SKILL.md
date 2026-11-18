@@ -2,7 +2,7 @@
 name: surfboard-testing
 description: "Test and verify a Surfboard Payments integration in the Demo environment: test cards, the payment lifecycle and its terminal states, capture, cancel, void, refund and partial refund, error codes, and proving an integration actually works before reporting success. Use when verifying an integration, debugging a failed payment, or implementing post-payment operations."
 metadata:
-  pack-version: "a9f4a5b0b2b6"
+  pack-version: "b6d3ec4e8bf2"
 ---
 
 # Testing and verification
@@ -12,8 +12,8 @@ from one that compiles.**
 
 ## The Demo environment
 
-Demo credentials come from the Developer Portal on signup, with no approval step.
-<https://developers.surfboardpayments.com/console/api-keys>
+Demo credentials come from the integration portal on signup, with no approval step.
+<https://integrate.surfboardpayments.com>
 
 | | Demo |
 |---|---|
@@ -87,12 +87,17 @@ failures come back as `P_0001: Input data validation failed.` followed by a free
 reason, and the prefix is not in the reference. For `P_0001` the message *is* the only
 discriminator, so read it. The common ones are in the table above.
 
+A missing field or an unknown id is **not** a 4xx. `POST /orders` without
+`terminal$id` answers 201 with `"Mandatory Properties missing terminal$id"`, and an
+unknown order id answers 200 with `OR_0016: Order not found`, both
+`"status": "ERROR"`. The codes below are the ones that do carry meaning:
+
 | HTTP | Meaning |
 |---|---|
-| 400 | Malformed body or a missing required field |
 | 401 | Credentials wrong, missing, or from the other environment |
 | 403 | Authenticated but not permitted; check `MERCHANT-ID` against the path |
-| 404 | An identifier in the path does not resolve |
+| 404 | The route does not exist (`Cannot GET /api/...`), usually a wrong path shape, not an unknown id |
+| 408 | Timed out upstream; retry with backoff |
 | 500 | Retry with backoff; if it persists, contact support |
 
 ## Failures that look like something else

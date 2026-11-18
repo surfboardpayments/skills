@@ -22,11 +22,11 @@ Before working with receipts, make sure you have:
 
 - A Surfboard developer account with valid API credentials (`API-KEY` and `API-SECRET`)
 - At least one completed transaction, payment, or order
-- For printing: a registered [terminal with a built-in printer](/products/?requirements=printer) or a [FinPrinter](/products/fins/finprinter)
+- For printing: a registered [terminal with a built-in printer](/products/?requirements=printer) or a [FinPrinter](/products/fins/finprinter/)
 
 ## Adding Receipt Information
 
-Use this endpoint to store cash register-specific details against an order. This data is used when generating receipt output and is often required for fiscal compliance in Nordic markets. If the register itself runs on Surfboard, see [Build Your Own ECR](/developers/guides/electronic-cash-register) for the full register lifecycle.
+Use this endpoint to store cash register-specific details against an order. This data is used when generating receipt output and is often required for fiscal compliance in Nordic markets. If the register itself runs on Surfboard, see [Build Your Own ECR](/developers/guides/electronic-cash-register/) for the full register lifecycle.
 
 ```
 PUT /receipts/{orderId}
@@ -138,7 +138,7 @@ The `{id}` path parameter accepts a Transaction ID, Payment ID, or Order ID.
 
 ## Printing Receipts on a Terminal
 
-Print a receipt directly on a Surfboard device with a printer: a [terminal with a built-in printer](/products/?requirements=printer), such as SurfPrint Pro, or a [FinPrinter](/products/fins/finprinter), the standalone cloud printer. Surfboard renders the receipt from the template configured in the Partner Portal, so the request carries an ID and a target device, nothing more.
+Print a receipt directly on a Surfboard device with a printer: a [terminal with a built-in printer](/products/?requirements=printer), such as SurfPrint Pro, or a [FinPrinter](/products/fins/finprinter/), the standalone cloud printer. Surfboard renders the receipt from the template configured in the Partner Portal, so the request carries an ID and a target device, nothing more.
 
 ```
 POST /receipts/{id}/print
@@ -176,7 +176,7 @@ The `{id}` path parameter accepts a Transaction ID, Payment ID, or Order ID.
 
 > **Note:** A `SUCCESS` response means the print command was dispatched to the terminal. The terminal must be online and not processing another command for the receipt to print.
 
-> **Note:** Which template renders is set in the Partner Portal at partner, merchant or store level, and the receipt content comes from the order's `orderLines`. The older `PUT /receipts/{id}/print` form with `templateId` and `language` still works but is superseded. For how templates are set up, how the FinPrinter fits in, and when to choose ESC/POS instead, see [Receipt Printing](/developers/guides/receipt-printing).
+> **Note:** Which template renders is set in the Partner Portal at partner, merchant or store level, and the receipt content comes from the order's `orderLines`. The older `PUT /receipts/{id}/print` form with `templateId` and `language` still works but is superseded. For how templates are set up, how the FinPrinter fits in, and when to choose ESC/POS instead, see [Receipt Printing](/developers/guides/receipt-printing/).
 
 ## Custom ESC/POS Printing
 
@@ -235,7 +235,7 @@ ESC/POS is a command protocol originally developed by Epson and now supported by
 2. Encode the entire byte stream as a Base64 string.
 3. Send the Base64 string in the `escposCommands` field, with `"codePages": "UTF-8"`.
 
-> **Note:** The table above is a starting point, not the full picture. Once you send `"codePages": "UTF-8"`, payloads are validated against a defined contract: UTF-8 text, a fixed command set, and line widths that vary by text size. Commands outside that set -- including `GS v 0` raster images and `ESC t` charset selection -- are rejected before they reach the terminal. See the [ESC/POS Printing](/developers/guides/escpos-printing) guide for the complete contract, a worked receipt, and a preflight validator.
+> **Note:** The table above is a starting point, not the full picture. Once you send `"codePages": "UTF-8"`, payloads are validated against a defined contract: UTF-8 text, a fixed command set, and line widths that vary by text size. Commands outside that set -- including `GS v 0` raster images and `ESC t` charset selection -- are rejected before they reach the terminal. See the [ESC/POS Printing](/developers/guides/escpos-printing/) guide for the complete contract, a worked receipt, and a preflight validator.
 
 > **Tip:** Generic ESC/POS libraries (`escpos` for Python, `node-escpos` for Node.js) can generate the byte stream for you, but their defaults often emit raster images and charset commands that the contract rejects. Check what your library actually produces before sending it.
 
@@ -249,4 +249,4 @@ ESC/POS is a command protocol originally developed by Epson and now supported by
 | Print receipt on terminal | POST | `/receipts/{id}/print` |
 | Print custom ESC/POS receipt | PUT | `/receipts/{terminalId}/escpos` |
 
-For full endpoint details, see the [Receipts API](https://developers.surfboardpayments.com/api/receipts) reference documentation. For a comparison of template printing and ESC/POS, see [Receipt Printing](/developers/guides/receipt-printing).
+For full endpoint details, see the [Receipts API](https://developers.surfboardpayments.com/api/receipts) reference documentation. For a comparison of template printing and ESC/POS, see [Receipt Printing](/developers/guides/receipt-printing/).

@@ -51,8 +51,8 @@ Tap to Pay on iPhone accepts contactless cards and NFC mobile wallets:
 
 | Type | Payment methods |
 |------|-----------------|
-| Card schemes | [Visa](/payment-methods/visa), [Mastercard](/payment-methods/mastercard), [American Express](/payment-methods/american-express), [Discover](/payment-methods/discover), [Dankort](/payment-methods/dankort) |
-| Mobile wallets | [Apple Pay](/payment-methods/apple-pay), [Google Pay](/payment-methods/google-pay) and other NFC wallets carrying a supported card |
+| Card schemes | [Visa](/payment-methods/visa/), [Mastercard](/payment-methods/mastercard/), [American Express](/payment-methods/american-express/), [Discover](/payment-methods/discover/), [Dankort](/payment-methods/dankort/) |
+| Mobile wallets | [Apple Pay](/payment-methods/apple-pay/), [Google Pay](/payment-methods/google-pay/) and other NFC wallets carrying a supported card |
 
 On-device PIN entry is supported. See [Cardholder Verification & PIN](#cardholder-verification--pin).
 
@@ -65,7 +65,7 @@ Tap to Pay on iPhone requires specific hardware and software:
 - **Beta iOS:** Beta versions of iOS are **not supported** for Tap to Pay on iPhone. Always test on stable iOS releases.
 - **Simulator:** The iOS Simulator supports SDK initialization and terminal registration, but cannot perform real NFC card reads. Use a physical device for end-to-end payment testing.
 
-> **Note:** Minimum device, iOS and SDK versions can change when Apple or the card schemes update their compliance requirements. Follow the [developer changelog](/docs/changelog) for SDK releases and requirement changes.
+> **Note:** Minimum device, iOS and SDK versions can change when Apple or the card schemes update their compliance requirements. Follow the [developer changelog](/docs/changelog/) for SDK releases and requirement changes.
 
 ## Prerequisites
 
@@ -348,7 +348,7 @@ Tap to Pay on iPhone only supports online PIN. Some cards require offline PIN, w
 
 <div class="not-prose my-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded-r-md text-sm">
   <div class="font-semibold font-display text-blue-800 mb-1">Recommendation</div>
-  <div class="text-blue-900">If a transaction is rejected or declined due to PIN or verification issues, ask the customer to try a different card or use an alternative payment method such as a <a href="/products/payment-links" class="text-green-600 hover:underline">Payment Link</a> or a traditional card reader.</div>
+  <div class="text-blue-900">If a transaction is rejected or declined due to PIN or verification issues, ask the customer to try a different card or use an alternative payment method such as a <a href="/platform/payment-links/" class="text-green-600 hover:underline">Payment Link</a> or a traditional card reader.</div>
 </div>
 
 ### Tapping the card

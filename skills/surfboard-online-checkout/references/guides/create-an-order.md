@@ -18,13 +18,13 @@ This guide covers basic order creation, line items, customer details, tax handli
 
 ## Prerequisites
 
-1. Create a developer account at the [Developer Portal](https://developers.surfboardpayments.com/sign-up)
+1. Create a developer account at the [integration portal](https://integrate.surfboardpayments.com/signup)
 2. Complete onboarding (merchant and store setup)
 3. A terminal to create the order against (any type -- in-store, PaymentPage, SelfHostedPage, or MerchantInitiated). In-store devices and SelfHostedPage are registered; an online store already carries a PaymentPage and a MerchantInitiated terminal, so fetch the store's terminals to find them.
 
 ## Basic Order
 
-Order, payment, and receipt endpoints are **not** merchant-scoped in the path. The merchant travels in the `MERCHANT-ID` header alongside `API-KEY` and `API-SECRET`, so the path is `/orders`, not `/merchants/{merchantId}/orders`. See [API Conventions](/developers/guides/api-conventions) for the full header set.
+Order, payment, and receipt endpoints are **not** merchant-scoped in the path. The merchant travels in the `MERCHANT-ID` header alongside `API-KEY` and `API-SECRET`, so the path is `/orders`, not `/merchants/{merchantId}/orders`. See [API Conventions](/developers/guides/api-conventions/) for the full header set.
 
 Create an order with a single line item and initiate payment:
 
@@ -87,9 +87,9 @@ Every order requires at least one line item in the `orderLines` array. Each line
 | `name` | Yes | Product name |
 | `quantity` | Yes | Quantity (negative for refunds) |
 | `amount.regular` | Yes | Unit price in smallest currency unit |
-| `amount.total` | Yes | **Unit** price after shipping and campaign (`regular + shipping - campaign`). Not the line total |
+| `amount.total` | Yes | **Unit** price after shipping and campaign (`regular + shipping - campaign`). Not the line total. With [`orderLineLevelCalculation`](#order-line-level-calculation) it is the line total instead |
 | `amount.currency` | Yes | Numeric ISO 4217 code (e.g., `"752"` for SEK) |
-| `amount.tax` | Yes | Tax array for the line. Required even at zero rate -- send a `0` entry rather than omitting it |
+| `amount.tax` | Yes | Tax array for the line. `tax[].amount` is the tax for the **whole line** and is never multiplied by `quantity`. Required even at zero rate -- send a `0` entry rather than omitting it |
 
 Optional fields include `description`, `brand`, `imageUrl`, `gtin`, `categoryId`, `unit`, and `metadata`.
 
@@ -107,7 +107,7 @@ Two lines, one of them with a quantity above one:
       "regular": 4500,
       "total": 4500,
       "currency": "752",
-      "tax": [{ "amount": 900, "percentage": 25, "type": "VAT" }]
+      "tax": [{ "amount": 1800, "percentage": 25, "type": "VAT" }]
     }
   },
   {
@@ -124,11 +124,11 @@ Two lines, one of them with a quantity above one:
 ]
 ```
 
-The first line contributes `4500 * 2 = 9000`, not `4500`. The order total is `19000`. The gift card is zero-rated and still carries a `tax` entry: omitting it returns `P_0001: Input data validation failed. Cannot read properties of undefined (reading 'vatValue')`.
+The first line contributes `4500 * 2 = 9000`, not `4500`. Its `tax` covers the whole line, so it is `1800`, not the `900` of a single cup. The order total is `19000`. The gift card is zero-rated and still carries a `tax` entry: omitting it returns `P_0001: Input data validation failed. Cannot read properties of undefined (reading 'vatValue')`.
 
 > **Currency format:** All amounts use the smallest currency unit. For example, 10.00 SEK = `1000`, 5.00 EUR = `500`.
 
-> **Prices include tax.** `amount.regular` and `amount.total` are gross. The `tax` array reports the VAT *contained within* that price, not an amount to add on top. See [API Conventions](/developers/guides/api-conventions) if you are coming from a sales-tax market.
+> **Prices include tax.** `amount.regular` and `amount.total` are gross. The `tax` array reports the VAT *contained within* that price, not an amount to add on top. See [API Conventions](/developers/guides/api-conventions/) if you are coming from a sales-tax market.
 
 ## Customer, Billing, and Shipping
 
@@ -195,6 +195,62 @@ Enable it when your line items have campaigns or shipping costs:
 }
 ```
 
+With the flag on, the fields on a line mean:
+
+| Field | Meaning |
+|-------|---------|
+| `amount.regular` | Unit price |
+| `amount.campaign` | Discount for the **whole line** |
+| `amount.shipping` | Shipping for the whole line |
+| `amount.total` | **Line total**: `regular * quantity + shipping - campaign`, exactly |
+| `amount.tax[].amount` | Tax for the whole line |
+
+This is how you send a discount that doesn't divide evenly by the quantity. Three items at 30.00 SEK with 10.00 SEK off the line come to 80.00 SEK. Per unit that would be 26.67 SEK, and `2667 * 3` is `8001`. With the flag, send the line as it is:
+
+```json
+{
+  "id": "ITEM-001",
+  "name": "T-shirt",
+  "quantity": 3,
+  "amount": {
+    "regular": 3000,
+    "campaign": 1000,
+    "total": 8000,
+    "currency": "752",
+    "tax": [{ "amount": 1600, "percentage": 25, "type": "VAT" }]
+  }
+}
+```
+
+### Weighed Items
+
+`quantity` accepts up to three decimals, so weighed goods go on one line with the weight as the quantity. Amounts are always integers in minor units, so with `orderLineLevelCalculation` on, round `regular * quantity` half up and send that as the line total. For 0.345 kg at 189.00 SEK/kg, `18900 * 0.345 = 6520.5`, which you send as `6521`:
+
+```json
+{
+  "id": "ITEM-002",
+  "name": "Coffee beans",
+  "quantity": 0.345,
+  "unit": "kg",
+  "amount": {
+    "regular": 18900,
+    "total": 6521,
+    "currency": "752",
+    "tax": [{ "amount": 699, "percentage": 12, "type": "VAT" }]
+  }
+}
+```
+
+## One Item With Several VAT Rates
+
+A single item can contain parts with different VAT rates, such as a dish at 12% with an add-on at 25%, or a meal deal made up of products with different rates. Send **one order line per VAT rate**, each with a single `tax[]` entry, rather than one line carrying the summed price.
+
+Several `tax[]` entries on one line are accepted, but multiple rates on one line are not fully supported for Klarna, so separate lines are the safe choice for every payment method.
+
+There is no parent/child field that groups lines into one item. To mark lines that belong together in your own system, use `categoryId`, `promotionApplied` or `metadata`. When the item is returned, one refund order can carry all of its negative lines at once.
+
+Surfboard does not cross-check line taxes against the line amount, so the breakdown is only as accurate as what you send. To set the order-level tax breakdown yourself, send `totalOrderAmount.tax`.
+
 ## Adjustments
 
 Adjustments modify the total order value for tips, donations, gift cards, or discounts:
@@ -243,7 +299,7 @@ When the final amount isn't known yet, use `authMode: "PRE-AUTH"` instead (spell
 }
 ```
 
-See the [Capture a Payment](/developers/guides/capture-a-payment) guide for the full flow.
+See the [Capture a Payment](/developers/guides/capture-a-payment/) guide for the full flow.
 
 ## Check Order Status
 
@@ -288,22 +344,22 @@ Every payment ends in one of three terminal states:
 
 Create order responses return `status: "ERROR"` with a code in the `OR_*`, `PS_*`, `GC_*`, or `SP_*` prefix when validation or initiation fails. The most common ones are `OR_0042` (terminal not found), `OR_0037` (invalid total), `OR_0048` (mixed currencies), and `PS_0025` (terminal not connected -- retry after configure).
 
-See the [Create Order Error Codes](/developers/guides/create-order-error-codes) reference for the full list, including errors thrown by the initiate payment step when both happen in the same call.
+See the [Create Order Error Codes](/developers/guides/create-order-error-codes/) reference for the full list, including errors thrown by the initiate payment step when both happen in the same call.
 
 ## Next Steps
 
 Once you have an order created, you can:
 
-- [Capture a Payment](/developers/guides/capture-a-payment) -- finalize a delayed-capture authorization
-- [Cancel a Payment](/developers/guides/cancel-a-payment) -- stop an in-progress payment
-- [Void a Payment](/developers/guides/void-a-payment) -- reverse a completed payment before settlement
-- [Refund an Order](/developers/guides/refund-an-order) -- return funds after settlement
-- [Partial Payments](/developers/guides/partial-payments) -- split an order across multiple payments
+- [Capture a Payment](/developers/guides/capture-a-payment/) -- finalize a delayed-capture authorization
+- [Cancel a Payment](/developers/guides/cancel-a-payment/) -- stop an in-progress payment
+- [Void a Payment](/developers/guides/void-a-payment/) -- reverse a completed payment before settlement
+- [Refund an Order](/developers/guides/refund-an-order/) -- return funds after settlement
+- [Partial Payments](/developers/guides/partial-payments/) -- split an order across multiple payments
 
 ## Reference
 
 - [Create Order API](https://developers.surfboardpayments.com/api/orders)
 - [Payments API](https://developers.surfboardpayments.com/api/payments)
-- [Create Order Error Codes](/developers/guides/create-order-error-codes)
-- [Payment Lifecycle](/developers/guides/payment-lifecycle)
-- [Developer Portal](https://developers.surfboardpayments.com/)
+- [Create Order Error Codes](/developers/guides/create-order-error-codes/)
+- [Payment Lifecycle](/developers/guides/payment-lifecycle/)
+- [Integration portal](https://integrate.surfboardpayments.com/)

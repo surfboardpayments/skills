@@ -2,7 +2,7 @@
 name: surfboard-onboarding
 description: "Onboard merchants onto Surfboard Payments as a platform or partner: create merchant, KYB application URL, poll application status, create stores, and provision terminals. Covers the merchants and logistics webhooks, account and service provider management, and partner branding. Use when a software platform needs to sign up its own customers to take payments."
 metadata:
-  pack-version: "a9f4a5b0b2b6"
+  pack-version: "b6d3ec4e8bf2"
 ---
 
 # Merchant onboarding

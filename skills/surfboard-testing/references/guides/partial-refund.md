@@ -82,6 +82,30 @@ POST /orders
 
 The `terminal$id` only needs to be a **valid** terminal -- it does **not** have to be the same terminal that processed the original purchase.
 
+## Returning Discounted Lines
+
+If the original order used [`orderLineLevelCalculation`](/developers/guides/create-an-order/#order-line-level-calculation), the return order works the same way, with negative lines. Send `orderLineLevelCalculation: true` again and give each return line its share of the line discount as `campaign`.
+
+The original line was 3 × 30.00 SEK with 10.00 SEK off, so 80.00 SEK. Returning one of the three:
+
+```json
+{
+  "id": "ITEM-001",
+  "purchaseOrderId": "ORIGINAL_ORDER_ID",
+  "name": "T-shirt",
+  "quantity": -1,
+  "amount": {
+    "regular": 3000,
+    "campaign": 333,
+    "total": -2667,
+    "currency": "752",
+    "tax": [{ "amount": 533, "percentage": 25, "type": "VAT" }]
+  }
+}
+```
+
+`campaign` stays positive and reduces the amount returned: `-(3000 - 333) = -2667`. The line total must match exactly. Refunds can't exceed the original `totalOrderAmount.total`, so if all three units come back in separate refunds, put the rounding remainder on the last one: `2667 + 2667 + 2666 = 8000`.
+
 ## Payment Method for Refunds
 
 Set `paymentMethod` to either the method the customer originally paid with, or `CARD_NP`:
@@ -161,7 +185,7 @@ Verify the partial refund completed:
 GET /orders/:orderId/status
 ```
 
-Track refund status via the API response or through [webhooks](/developers/guides/webhooks-notifications).
+Track refund status via the API response or through [webhooks](/developers/guides/webhooks-notifications/).
 
 ## Partial Refund via Partner Portal
 
@@ -180,6 +204,6 @@ When the original order included adjustments (tips, discounts), the first partia
 ## Reference
 
 - [Create Order API](https://developers.surfboardpayments.com/api/orders)
-- [Refund an Order](/developers/guides/refund-an-order)
-- [Payment Lifecycle](/developers/guides/payment-lifecycle)
-- [Developer Portal](https://developers.surfboardpayments.com/)
+- [Refund an Order](/developers/guides/refund-an-order/)
+- [Payment Lifecycle](/developers/guides/payment-lifecycle/)
+- [Integration portal](https://integrate.surfboardpayments.com/)

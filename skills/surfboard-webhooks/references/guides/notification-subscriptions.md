@@ -12,7 +12,7 @@ generated: true
 
 ## Overview
 
-Notification subscriptions let you set up persistent, account-wide delivery of event notifications at the merchant or partner level. Unlike [webhooks](/developers/guides/webhooks-notifications), which deliver HTTP callbacks to your server, notification subscriptions deliver events through **email**, **Slack**, and **SFTP** channels.
+Notification subscriptions let you set up persistent, account-wide delivery of event notifications at the merchant or partner level. Unlike [webhooks](/developers/guides/webhooks-notifications/), which deliver HTTP callbacks to your server, notification subscriptions deliver events through **email**, **Slack**, and **SFTP** channels.
 
 Use notification subscriptions for ongoing operational alerts such as daily settlement reports, rather than real-time payment status updates.
 

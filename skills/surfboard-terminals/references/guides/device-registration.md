@@ -12,11 +12,11 @@ generated: true
 
 ## Overview
 
-Before a terminal can accept payments -- or receive a partner POS app -- it must be **registered to a store** under a merchant. Registration links the physical (or software) device to your merchant hierarchy. Once a terminal is registered to a store, it cannot be repurposed by another merchant. You can still move it between stores under the same merchant using the [Change Store](/developers/guides/terminal-device-management) endpoint.
+Before a terminal can accept payments -- or receive a partner POS app -- it must be **registered to a store** under a merchant. Registration links the physical (or software) device to your merchant hierarchy. Once a terminal is registered to a store, it cannot be repurposed by another merchant. You can still move it between stores under the same merchant using the [Change Store](/developers/guides/terminal-device-management/) endpoint.
 
 Surfboard supports several registration methods so you can pick the lowest-friction option for your setup. They are **not mutually exclusive** -- the same terminal can be registered through whichever path the merchant has available.
 
-> If you integrate through one of our SDKs (Android SoftPOS, Tap to Pay on iPhone), the SDK handles registration for you and you do not need to call the registration APIs directly. See [Android SoftPOS SDK](/developers/guides/android-softpos-sdk) and [Tap to Pay on iPhone](/developers/guides/tap-to-pay-iphone).
+> If you integrate through one of our SDKs (Android SoftPOS, Tap to Pay on iPhone), the SDK handles registration for you and you do not need to call the registration APIs directly. See [Android SoftPOS SDK](/developers/guides/android-softpos-sdk/) and [Tap to Pay on iPhone](/developers/guides/tap-to-pay-iphone/).
 
 ## When Is Registration Needed?
 
@@ -130,7 +130,7 @@ For **SoftPOS** running CheckoutX, you can register a device by switching into t
 
 This is the smoothest option for SoftPOS and partner POS apps that already integrate with CheckoutX. It is **not available for EMV terminals**, which must use one of the code- or QR-based methods above.
 
-For the full app-switch flow -- generating the interapp code, building the deep link, and handling the callback -- see the [Inter-App Integration](/developers/guides/interapp-integration) guide.
+For the full app-switch flow -- generating the interapp code, building the deep link, and handling the callback -- see the [Inter-App Integration](/developers/guides/interapp-integration/) guide.
 
 ---
 
@@ -138,9 +138,9 @@ For the full app-switch flow -- generating the interapp code, building the deep 
 
 Once a terminal is registered:
 
-- Use the returned `terminalId` to create orders and initiate payments. See [Create an Order](/developers/guides/create-an-order).
-- Apply configuration (network, language, restart schedule, and more) -- see [Terminal & Device Management](/developers/guides/terminal-device-management).
-- Move the terminal between stores under the same merchant with the Change Store endpoint, or reassign across merchants (partner-managed inventory) with Move Terminal -- both covered in [Terminal & Device Management](/developers/guides/terminal-device-management).
+- Use the returned `terminalId` to create orders and initiate payments. See [Create an Order](/developers/guides/create-an-order/).
+- Apply configuration (network, language, restart schedule, and more) -- see [Terminal & Device Management](/developers/guides/terminal-device-management/).
+- Move the terminal between stores under the same merchant with the Change Store endpoint, or reassign across merchants (partner-managed inventory) with Move Terminal -- both covered in [Terminal & Device Management](/developers/guides/terminal-device-management/).
 
 ## API Quick Reference
 
@@ -154,8 +154,8 @@ Once a terminal is registered:
 
 - [Register Device API](https://developers.surfboardpayments.com/references/api/terminals/register-device)
 - [Get Device Registration Code API](https://developers.surfboardpayments.com/references/api/terminals/get-device-registration-code)
-- [Inter-App Integration](/developers/guides/interapp-integration)
-- [EMV Terminal Integration](/developers/guides/emv-terminal-integration)
-- [Terminal & Device Management](/developers/guides/terminal-device-management)
+- [Inter-App Integration](/developers/guides/interapp-integration/)
+- [EMV Terminal Integration](/developers/guides/emv-terminal-integration/)
+- [Terminal & Device Management](/developers/guides/terminal-device-management/)
 </content>
 </invoke>

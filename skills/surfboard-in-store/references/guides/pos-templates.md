@@ -71,7 +71,7 @@ POST /merchants/:merchantId/stores/:storeId/templates
 
 **Order is meaningful in every array here.** `paymentMethodOrder`, `productOrder` and `terminalOrder` are display order, not sets, so the first entry is what a member of staff reaches for without thinking. Put the thing they sell most at the front and the layout does the training.
 
-Product IDs come from the catalog. See [Product Catalog](/developers/guides/product-catalog) for creating products, variants and categories.
+Product IDs come from the catalog. See [Product Catalog](/developers/guides/product-catalog/) for creating products, variants and categories.
 
 ## Managing Templates
 
@@ -96,6 +96,6 @@ A till is used by someone who is being watched by a customer, so the rules are u
 ## Reference
 
 - [Templates API](https://developers.surfboardpayments.com/api/templates)
-- [Product Catalog](/developers/guides/product-catalog)
-- [Payment Methods](/developers/guides/payment-methods)
-- [Terminal & Device Management](/developers/guides/terminal-device-management)
+- [Product Catalog](/developers/guides/product-catalog/)
+- [Payment Methods](/developers/guides/payment-methods/)
+- [Terminal & Device Management](/developers/guides/terminal-device-management/)

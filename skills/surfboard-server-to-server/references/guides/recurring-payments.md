@@ -14,7 +14,7 @@ generated: true
 
 Recurring payments let you charge customers on a schedule without requiring them to re-enter card details each time. This guide covers the full lifecycle: tokenizing a card during the initial payment, configuring subscription parameters, charging with stored tokens, and managing the subscription over time.
 
-This builds on the concepts introduced in the [Server-to-Server API](/guides/server-to-server-api) guide. If you are new to Merchant Initiated Transactions (MIT) and tokenization, start there first.
+This builds on the concepts introduced in the [Server-to-Server API](/developers/guides/server-to-server-api/) guide. If you are new to Merchant Initiated Transactions (MIT) and tokenization, start there first.
 
 ## How It Works
 
@@ -204,7 +204,7 @@ When a recurring charge fails, the order status will show `PAYMENT_FAILED` or `P
 
 ## Reference
 
-- [Server-to-Server API Guide](/guides/server-to-server-api) -- Tokenization and MIT fundamentals
+- [Server-to-Server API Guide](/developers/guides/server-to-server-api/) -- Tokenization and MIT fundamentals
 - [Create Order API](https://developers.surfboardpayments.com/api/orders)
 - [Initiate Payment API](https://developers.surfboardpayments.com/api/payments)
 - [Token Management](https://developers.surfboardpayments.com/api/orders)

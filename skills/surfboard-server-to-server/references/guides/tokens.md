@@ -14,7 +14,7 @@ generated: true
 
 A token is a reference to a card that Surfboard holds and you do not. The customer enters their details once, on a page or a terminal that is already in scope for PCI DSS, and you get back a `tokenId` you can charge later without the card ever touching your systems.
 
-That is what makes the rest possible: subscription renewals, one-click repeat purchases, deposits settled after the fact, refunds routed back to the original card. This guide covers producing a token, reading it, and storing it. Charging one is [Server-to-Server API](/developers/guides/server-to-server-api), and scheduling the charges is [Recurring Payments](/developers/guides/recurring-payments).
+That is what makes the rest possible: subscription renewals, one-click repeat purchases, deposits settled after the fact, refunds routed back to the original card. This guide covers producing a token, reading it, and storing it. Charging one is [Server-to-Server API](/developers/guides/server-to-server-api/), and scheduling the charges is [Recurring Payments](/developers/guides/recurring-payments/).
 
 | Where the card is entered | What tokenization gives you |
 |---------------------------|------------------------------|
@@ -58,7 +58,7 @@ Three flags decide how hard you insist, and the difference matters when the card
 
 Pick by what breaks if there is no token. A subscription with no token to renew against is worse than a failed first payment, so `errorIfTokenizationFails` is right there. A shop offering "save this card for next time" should not lose the sale over it, so `tokenisationIfPossible` is right there.
 
-For subscriptions, pair tokenization with the `recurring` block so the first payment is authorised as the start of a series rather than a one-off — see [Payment Page](/developers/guides/payment-page#recurring-orders).
+For subscriptions, pair tokenization with the `recurring` block so the first payment is authorised as the start of a series rather than a one-off — see [Payment Page](/developers/guides/payment-page/#recurring-orders).
 
 ## Step 2: Fetch the Token
 
@@ -121,7 +121,7 @@ POST /payments
 
 > The `tokenId` goes inside `paymentMethodParams`. Sent at the top level, the payment is rejected with `PS_0046: TokenID is required to perform CTOKEN payments`.
 
-A charge with no customer present is a Merchant Initiated Transaction, and it needs a terminal in `MerchantInitiated` mode — the terminal the customer paid on cannot do it. An online store is provisioned with one, so this is usually a matter of reading the store's terminal list rather than registering anything. [Server-to-Server API](/developers/guides/server-to-server-api) covers the setup and the rules that come with MIT.
+A charge with no customer present is a Merchant Initiated Transaction, and it needs a terminal in `MerchantInitiated` mode — the terminal the customer paid on cannot do it. An online store is provisioned with one, so this is usually a matter of reading the store's terminal list rather than registering anything. [Server-to-Server API](/developers/guides/server-to-server-api/) covers the setup and the rules that come with MIT.
 
 ## Expiry and Housekeeping
 
@@ -137,6 +137,6 @@ Build the re-authorisation path before you need it: a link back to a payment pag
 
 - [Fetch Tokens from Order](https://developers.surfboardpayments.com/api/orders)
 - [Payments API](https://developers.surfboardpayments.com/api/payments)
-- [Server-to-Server API](/developers/guides/server-to-server-api)
-- [Recurring Payments](/developers/guides/recurring-payments)
-- [Payment Page](/developers/guides/payment-page)
+- [Server-to-Server API](/developers/guides/server-to-server-api/)
+- [Recurring Payments](/developers/guides/recurring-payments/)
+- [Payment Page](/developers/guides/payment-page/)

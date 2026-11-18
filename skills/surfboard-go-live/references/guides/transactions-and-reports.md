@@ -53,7 +53,7 @@ Past the last page you get `SUCCESS` with an empty `data` array rather than an e
 GET /transactions/:id/list
 ```
 
-Accepts an `orderId`, a `paymentId` or a `transactionId` and returns every transaction attached to it. This is the call for an order settled in parts: one order, several payments, several transactions, all of them here. See [Partial Payments](/developers/guides/partial-payments) for how those orders come about.
+Accepts an `orderId`, a `paymentId` or a `transactionId` and returns every transaction attached to it. This is the call for an order settled in parts: one order, several payments, several transactions, all of them here. See [Partial Payments](/developers/guides/partial-payments/) for how those orders come about.
 
 ### Search
 
@@ -167,7 +167,7 @@ Come to support with the specifics, and it is usually resolved in one pass:
 The report is the summary; the API is the ledger behind it. A reconciliation job that runs monthly usually does this:
 
 1. Pull the period's transactions with `GET /transactions?startDate=&endDate=`, paging to the end.
-2. Pull the settlement reports for the same period — `GET /partners/:partnerId/merchants/:merchantId/reports`. See [Settlements & Reporting](/developers/guides/settlements-reporting).
+2. Pull the settlement reports for the same period — `GET /partners/:partnerId/merchants/:merchantId/reports`. See [Settlements & Reporting](/developers/guides/settlements-reporting/).
 3. Group transactions by their own date, and payouts by payout date. Do not expect the two groupings to agree; the difference is exactly *from last period* plus *unsettled from period*.
 4. Investigate the individual items by ID with `GET /transactions/:id/list`.
 
@@ -176,7 +176,7 @@ Automate the grouping and the two reconciling numbers, and month-end stops being
 ## Reference
 
 - [Reporting API](https://developers.surfboardpayments.com/api/reporting)
-- [Settlements & Reporting](/developers/guides/settlements-reporting)
-- [Partial Payments](/developers/guides/partial-payments)
-- [Payment Lifecycle](/developers/guides/payment-lifecycle)
-- [Notification Subscriptions](/developers/guides/notification-subscriptions) — settlement reports delivered by email or SFTP
+- [Settlements & Reporting](/developers/guides/settlements-reporting/)
+- [Partial Payments](/developers/guides/partial-payments/)
+- [Payment Lifecycle](/developers/guides/payment-lifecycle/)
+- [Notification Subscriptions](/developers/guides/notification-subscriptions/) — settlement reports delivered by email or SFTP

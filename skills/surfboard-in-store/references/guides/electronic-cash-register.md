@@ -48,17 +48,17 @@ Cash registers belong to the store, not to a terminal. A store can have several.
 
 Your POS application can live in either of two places:
 
-- **On the Surfboard terminal.** SurfTouch and SurfPrint run Android. Your app runs on the device beside the payment application and hands off payments with a native app switch. See [Inter-App Integration](/developers/guides/interapp-integration).
-- **On your own hardware.** A tablet, a PC, or your cloud backend creates orders over the API against the terminal, and the terminal takes the payment. See [Create an Order](/developers/guides/create-an-order).
+- **On the Surfboard terminal.** SurfTouch and SurfPrint run Android. Your app runs on the device beside the payment application and hands off payments with a native app switch. See [Inter-App Integration](/developers/guides/interapp-integration/).
+- **On your own hardware.** A tablet, a PC, or your cloud backend creates orders over the API against the terminal, and the terminal takes the payment. See [Create an Order](/developers/guides/create-an-order/).
 
 Either way the cash register is the same record, operated with the same twelve endpoints, and every sale is an order created against the terminal that currently holds an open shift on the register. A phone running CheckoutX SoftPOS is a terminal like any other here: it opens shifts, takes sales and closes shifts on a register exactly as the hardware terminals do.
 
 ## Prerequisites
 
-1. A partner account with API credentials from the [Developer Portal](https://developers.surfboardpayments.com/), and the base URL, key and secret in configuration as described in [API Conventions](/developers/guides/api-conventions).
+1. A partner account with API credentials from the [integration portal](https://integrate.surfboardpayments.com/), and the base URL, key and secret in configuration as described in [API Conventions](/developers/guides/api-conventions/).
 2. ECR enabled for your partner account. [Get Partner Config](https://developers.surfboardpayments.com/api/partners) returns `ecrEnabled`, which states whether the partner has access to the cash-register features. If it is `false`, ask your Surfboard contact to enable it before you start.
-3. A Swedish merchant onboarded through [Merchant Onboarding](/developers/guides/merchant-onboarding), with a store. You need the `merchantId` and `storeId`.
-4. A terminal registered to that store, so you have its `terminalId`. See [Device Registration](/developers/guides/device-registration). You can list a store's terminals with `GET /merchants/:merchantId/stores/:storeId/terminals`.
+3. A Swedish merchant onboarded through [Merchant Onboarding](/developers/guides/merchant-onboarding/), with a store. You need the `merchantId` and `storeId`.
+4. A terminal registered to that store, so you have its `terminalId`. See [Device Registration](/developers/guides/device-registration/). You can list a store's terminals with `GET /merchants/:merchantId/stores/:storeId/terminals`.
 
 > **Note:** A charge applies for every cash register created under a merchant. Create the registers a store actually needs, not one per test run.
 
@@ -154,7 +154,7 @@ PATCH /catalog/:catalogId/products/:productId/inventory
 }
 ```
 
-The full catalog lifecycle, including variants, related products and statistics, is in [Product Catalog](/developers/guides/product-catalog).
+The full catalog lifecycle, including variants, related products and statistics, is in [Product Catalog](/developers/guides/product-catalog/).
 
 ## Step 2: Create the Cash Registers
 
@@ -260,7 +260,7 @@ What Skatteverket asks for, and where it comes from:
 | Control unit serial number (*tillverkningsnummer*) | `controlUnitSerialNumber` |
 | Control unit address | `controlUnitAddress` |
 
-The same details are shown on the register's **Info** tab in the partner portal, where a **Declare with Skatteverket** button opens the e-service. See [Cash Registers (ECR)](/partner-portal/cash-registers) in the partner portal guide.
+The same details are shown on the register's **Info** tab in the partner portal, where a **Declare with Skatteverket** button opens the e-service. See [Cash Registers (ECR)](/partner-portal/cash-registers/) in the partner portal guide.
 
 A practical onboarding flow for your merchants:
 
@@ -540,27 +540,27 @@ POST /orders
 
 The response returns `orderId` and `paymentId`. Store both against your POS receipt so refunds and receipt lookups can find them later.
 
-Three rules from [Create an Order](/developers/guides/create-an-order) that matter more on a till than anywhere else:
+Three rules from [Create an Order](/developers/guides/create-an-order/) that matter more on a till than anywhere else:
 
 - **`amount.total` is per unit, not per line.** The line above is two units at 45.00 SEK. `total` stays `4500`; only `totalOrderAmount` carries the `9000`.
 - **Prices are tax-inclusive.** The `tax` array states how much VAT is inside the price, never an amount to add on top. Sweden's 25, 12 and 6 percent rates each go on their own lines with their own `tax` entries.
 - **Currencies are numeric ISO 4217 codes as strings.** SEK is `"752"`.
 
-Fields under `controlFunctions.receipt` are printed on the receipt. Besides `cashierName` you can send `autoPrintReceipt` and `autoSendReceiptIfEmailAvailable`. If you prefer to add receipt details after the payment, use `PUT /orders/:orderId/receipt` as described in [Receipts](/developers/guides/receipts).
+Fields under `controlFunctions.receipt` are printed on the receipt. Besides `cashierName` you can send `autoPrintReceipt` and `autoSendReceiptIfEmailAvailable`. If you prefer to add receipt details after the payment, use `PUT /orders/:orderId/receipt` as described in [Receipts](/developers/guides/receipts/).
 
 > **The receipt number is the register's, not yours.** On an order that goes through a Surfboard register, the receipt number shown on the receipt is generated by the register in line with the regulations, and the series is per cash register: two registers give two series. A `sequenceNumber` you send is stored on the order for your own reference but does not change the printed number. The `cashRegisterName` and `controlUnitSerialNumber` receipt fields are for the bring-your-own-control-unit path in Step 6, not for Surfboard registers. Keep the `orderId` on your side; it is printed on every Surfboard receipt and is the key to find a sale when a customer comes back with one.
 
 ### Returns and refunds
 
-A return is an order with negative quantities. Set `purchaseOrderId` on each returned line to the `orderId` of the original sale; the reference marks it as mandatory for a return item. The full flow, including refunding to the original payment, is in [Refund an Order](/developers/guides/refund-an-order) and [Partial Refund](/developers/guides/partial-refund).
+A return is an order with negative quantities. Set `purchaseOrderId` on each returned line to the `orderId` of the original sale; the reference marks it as mandatory for a return item. The full flow, including refunding to the original payment, is in [Refund an Order](/developers/guides/refund-an-order/) and [Partial Refund](/developers/guides/partial-refund/).
 
 ### Cash sales
 
-Cash is a payment method like any other; a cash sale is still an order on the register, so it lands in the fiscal journal and on the Z-report. The [Partial Payments](/developers/guides/partial-payments) guide shows a second payment taken with the `CASH` method. Cash movements that are not sales, such as floats and bank drops, are the petty-cash calls in Step 4.
+Cash is a payment method like any other; a cash sale is still an order on the register, so it lands in the fiscal journal and on the Z-report. The [Partial Payments](/developers/guides/partial-payments/) guide shows a second payment taken with the `CASH` method. Cash movements that are not sales, such as floats and bank drops, are the petty-cash calls in Step 4.
 
 ### Split and mixed payments
 
-Card plus gift card, or card plus cash, are handled with partial payments on the same order. See [Partial Payments](/developers/guides/partial-payments) and [Gift Cards & Promotions](/developers/guides/gift-cards-promotions).
+Card plus gift card, or card plus cash, are handled with partial payments on the same order. See [Partial Payments](/developers/guides/partial-payments/) and [Gift Cards & Promotions](/developers/guides/gift-cards-promotions/).
 
 ## Step 6: Receipts
 
@@ -568,10 +568,10 @@ Once the payment completes, the receipt options are the same as for any Surfboar
 
 - **Digital receipt link.** `GET /receipts/{id}/link` returns a hosted receipt URL to show as a QR code or send in an SMS.
 - **Email.** `PUT /receipts/{id}/email` sends the receipt to the customer.
-- **Print on the terminal.** `POST /receipts/{id}/print` prints from a Surfboard template on a terminal with a built-in printer or on a FinPrinter. See [Receipt Printing](/developers/guides/receipt-printing).
-- **Your own layout.** `PUT /receipts/{terminalId}/escpos` prints a receipt you have rendered yourself. See [ESC/POS Printing](/developers/guides/escpos-printing).
+- **Print on the terminal.** `POST /receipts/{id}/print` prints from a Surfboard template on a terminal with a built-in printer or on a FinPrinter. See [Receipt Printing](/developers/guides/receipt-printing/).
+- **Your own layout.** `PUT /receipts/{terminalId}/escpos` prints a receipt you have rendered yourself. See [ESC/POS Printing](/developers/guides/escpos-printing/).
 
-All of them are covered in [Receipts](/developers/guides/receipts).
+All of them are covered in [Receipts](/developers/guides/receipts/).
 
 > **Already have a certified control unit?** If your existing POS keeps its own control unit and you only use Surfboard for payments and receipts, you can attach that unit's data to the receipt instead of creating a Surfboard register. `POST /receipts/:id` in the [Receipts API](https://developers.surfboardpayments.com/api/receipts) takes `receiptNumber`, `cashRegisterName`, `controlUnitSerial` and `cashierName`. That path is for partners who bring their own fiscal setup; everything else in this guide assumes Surfboard's.
 
@@ -604,7 +604,7 @@ All three query parameters are optional and each is applied only when present. `
 
 `sequence` is the file's ordinal within its report type, so a gap in the Z-report sequence in your archive means a day you have not fetched yet. The partner portal offers the same files under the register's **Reports** tab, filtered by *Z report*, *X report* or *Journal Memory* and a date range.
 
-For accounting, the merchant can also receive **SIE files**. These are generated per merchant, not per register, and sent for every payout Surfboard makes to the merchant. They are switched on with **Enable bookkeeping** on the merchant's Cash-Register tab in the partner portal. Settlement and payout reporting for the same money is in [Settlements & Reporting](/developers/guides/settlements-reporting).
+For accounting, the merchant can also receive **SIE files**. These are generated per merchant, not per register, and sent for every payout Surfboard makes to the merchant. They are switched on with **Enable bookkeeping** on the merchant's Cash-Register tab in the partner portal. Settlement and payout reporting for the same money is in [Settlements & Reporting](/developers/guides/settlements-reporting/).
 
 ## Step 8: Decommission a Register
 
@@ -628,11 +628,11 @@ DELETE /merchants/:merchantId/stores/:storeId/cash-register/:cashRegisterId
 
 The build order that gets a first merchant live with the least rework:
 
-1. **Build in demo.** Demo credentials come with your developer account. Create a test merchant and store, register a terminal, and run the full day: create register, open shift, sales, cash movements, close shift, End of Day, fetch the Z-report. Demo terminals run in payment page mode and take test cards only, so exercise the register flow there and the terminal hardware once you have live credentials. See [API Conventions](/developers/guides/api-conventions) for the environments.
+1. **Build in demo.** Demo credentials come with your developer account. Create a test merchant and store, register a terminal, and run the full day: create register, open shift, sales, cash movements, close shift, End of Day, fetch the Z-report. Demo terminals run in payment page mode and take test cards only, so exercise the register flow there and the terminal hardware once you have live credentials. See [API Conventions](/developers/guides/api-conventions/) for the environments.
 2. **Wire the catalog sync.** Decide what triggers a product update in your ERP and push it to the catalog on that event. A nightly full sync plus event-driven price changes is the usual shape.
 3. **Put the state check first.** Every register screen in your POS starts with Fetch Cash Registers for the store and Get Cash Register State for the chosen one. It is what keeps a cashier from opening a shift on a register that is already open elsewhere, or calling End of Day twice.
 4. **Make End of Day deliberate.** Confirmation dialog, and a visible note that it cannot be undone. Set the scheduled close time per store so a forgotten End of Day still happens.
-5. **Listen for payment events.** Subscribe to order and payment webhooks so the POS learns the outcome of a payment without polling. See [Webhooks](/developers/guides/webhooks-notifications).
+5. **Listen for payment events.** Subscribe to order and payment webhooks so the POS learns the outcome of a payment without polling. See [Webhooks](/developers/guides/webhooks-notifications/).
 6. **Register your POS with the control unit provider.** Before the first production register can be created, Surfboard registers your POS software with the control unit provider. Send your Surfboard contact:
    - Company name and organisation number. The company name cannot be changed once the application is submitted, so use the entity that will own the product.
    - A unique cash register software identifier in reverse-domain form, 1 to 64 characters, for example `se.yourcompany`.
@@ -666,10 +666,10 @@ The build order that gets a first merchant live with the least rework:
 - [Electronic Cash Register (ECR) V2 API](https://developers.surfboardpayments.com/api/electronic-cash-register)
 - [Orders API](https://developers.surfboardpayments.com/api/orders)
 - [Receipts API](https://developers.surfboardpayments.com/api/receipts)
-- [Cash Registers (ECR) in the partner portal](/partner-portal/cash-registers)
-- [Product Catalog](/developers/guides/product-catalog)
-- [Create an Order](/developers/guides/create-an-order)
-- [Receipts](/developers/guides/receipts)
-- [Device Registration](/developers/guides/device-registration)
-- [Merchant Onboarding](/developers/guides/merchant-onboarding)
+- [Cash Registers (ECR) in the partner portal](/partner-portal/cash-registers/)
+- [Product Catalog](/developers/guides/product-catalog/)
+- [Create an Order](/developers/guides/create-an-order/)
+- [Receipts](/developers/guides/receipts/)
+- [Device Registration](/developers/guides/device-registration/)
+- [Merchant Onboarding](/developers/guides/merchant-onboarding/)
 - [Skatteverket: How to report a cash register](https://www.skatteverket.se/servicelankar/otherlanguages/englishengelska/businessesandemployers/startingandrunningaswedishbusiness/cashregisters/howtoreportacashregister.4.57cadbbd15a3688ff44de5a.html)

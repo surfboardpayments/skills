@@ -79,6 +79,25 @@ GET /partners/:partnerId/merchants/:merchantId/reports
 
 Use the `url` field to download or redirect merchants to a detailed breakdown of every transaction in the settlement period.
 
+## When Payouts Arrive
+
+Payout timing depends on the payment method. It is written as T+ a number of days, where T is the transaction date.
+
+| Payment method | Expected payout |
+|---|---|
+| Klarna | T+7 |
+| Account-to-account (Pay by Bank) | T+7 |
+| Epassi | T+7 |
+| American Express | Usually T+3, can differ in some markets |
+| MobilePay | T+3 |
+| Vipps | T+3 |
+| Swish online with phone number (`SSWISH`) | T+3 |
+| Swish in-store with QR code (`NSWISH`) | T+1 |
+
+Visa and Mastercard payments follow the merchant's [settlement cut-off](/partner-portal/settlement-schedule/#settlement-cut-off-time), T+1 or T+2. The cut-off does not shorten the timing in the table.
+
+Because timing differs per method, one day's sales can reach the merchant's bank across more than one payout. Allow for this when you match payouts to a day's trading.
+
 ## Reading a Settlement Report
 
 This is the part support gets asked about most, so it is worth understanding before a merchant asks you.
@@ -92,7 +111,7 @@ Both are correct. They measure different things, and at a month boundary they ca
 
 ### Why the two totals differ
 
-Payouts lag transactions by two to three days. A payout issued on 1 May settles transactions from the end of April, and the transactions from the last days of May are paid out in June. So the payout-date total borrows from the previous month at one end and loses to the next month at the other.
+Visa and Mastercard payouts lag transactions by two to three days, and [some payment methods take longer](#when-payouts-arrive). A payout issued on 1 May settles transactions from the end of April, and the transactions from the last days of May are paid out in June. So the payout-date total borrows from the previous month at one end and loses to the next month at the other.
 
 Take a merchant on daily payouts in May:
 
@@ -132,7 +151,7 @@ paid out      │ 01 May  02 May │ 03 May  ...  01 Jun  02 Jun │
                  inside May's payouts          inside June's payouts
 ```
 
-To show a merchant where a specific transaction went, take its date, add the settlement lag, and read off both columns. That is the whole mapping.
+To show a merchant where a specific transaction went, take its date, add the [settlement lag for its payment method](#when-payouts-arrive), and read off both columns. That is the whole mapping.
 
 ### The fee is not taken out of the payout
 
@@ -389,7 +408,7 @@ DELETE /partners/:partnerId/billing-plans/:id
 GET    /partners/:partnerId/merchants/:merchantId/plans
 ```
 
-The last one is the useful one in support: it returns the plans actually assigned to a merchant, which is the answer to "why was I charged this". Plans are attached to a merchant during onboarding through the `transactionPricingPlan` and `displayProducts` control fields — see [Merchant Onboarding](/developers/guides/merchant-onboarding) and [Order and Return Terminals](/developers/guides/terminal-logistics).
+The last one is the useful one in support: it returns the plans actually assigned to a merchant, which is the answer to "why was I charged this". Plans are attached to a merchant during onboarding through the `transactionPricingPlan` and `displayProducts` control fields — see [Merchant Onboarding](/developers/guides/merchant-onboarding/) and [Order and Return Terminals](/developers/guides/terminal-logistics/).
 
 ## Customer Details
 

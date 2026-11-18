@@ -2,7 +2,7 @@
 name: surfboard-server-to-server
 description: "Recurring and subscription billing with Surfboard Payments: Merchant Initiated Transactions, tokenising a card on the first customer payment, then charging it from your backend. Covers enforceTokenization, token storage and reuse, the two terminals required, and B2B invoicing. Use for subscriptions, retainers, usage billing, saved cards, or any charge without the customer present."
 metadata:
-  pack-version: "a9f4a5b0b2b6"
+  pack-version: "b6d3ec4e8bf2"
 ---
 
 # Server-to-server and recurring payments

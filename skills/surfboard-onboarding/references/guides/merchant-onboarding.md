@@ -34,7 +34,7 @@ The typical flow is:
 
 Before onboarding merchants:
 
-1. Create a developer account at the [Developer Portal](https://developers.surfboardpayments.com/sign-up)
+1. Create a developer account at the [integration portal](https://integrate.surfboardpayments.com/signup)
 2. Obtain your `partnerId` from the Developer Portal Console
 3. Generate API credentials (API key and secret)
 
@@ -271,7 +271,7 @@ You can pre-select devices for automatic shipment using `preSelectProducts`, or 
 
 ### Linking a service provider
 
-If a service provider already exists when you onboard the merchant, you can link it and set its standing share in the same call under `controlFields.merchantConfig.serviceProvider`. See [Service Providers & Split Payouts](/developers/guides/service-providers).
+If a service provider already exists when you onboard the merchant, you can link it and set its standing share in the same call under `controlFields.merchantConfig.serviceProvider`. See [Service Providers & Split Payouts](/developers/guides/service-providers/).
 
 ## Step 2: The Merchant Completes the Web KYB
 
@@ -326,7 +326,7 @@ GET /partners/{partnerId}/merchants/{applicationId}/status
 | `APPLICATION_COMPLETED` | Compliance review passed; the merchant is being created. |
 | `MERCHANT_CREATED` | The merchant is live and can transact. `merchantId` and `storeId` are returned. |
 
-> **Tip:** You can also receive status updates via webhooks instead of polling. Configure webhooks in the Developer Portal Console. See [Webhooks & Notifications](/developers/guides/webhooks-notifications).
+> **Tip:** You can also receive status updates via webhooks instead of polling. Configure webhooks in the Developer Portal Console. See [Webhooks & Notifications](/developers/guides/webhooks-notifications/).
 
 ## Step 4: Create Additional Stores
 
@@ -378,7 +378,7 @@ For an online store, add `onlineInfo` with your webshop URLs:
 Online stores in production require domain verification before they can process payments:
 
 1. **Get verification keys** -- returned in the Create Store response (`merchantURLDomainVerificationKey` and `paymentPageURLDomainVerificationKey`)
-2. **Publish the key** -- add the verification key as a TXT record on your domain, or serve it at `https://<your-domain>/.well-known/sb-domain-verification.txt` if you can't edit the DNS (see [Store Management](/developers/guides/store-management#option-b-https-file))
+2. **Publish the key** -- add the verification key as a TXT record on your domain, or serve it at `https://<your-domain>/.well-known/sb-domain-verification.txt` if you can't edit the DNS (see [Online Store Domains](/developers/guides/online-store-domains/#option-b-https-file))
 3. **Trigger verification** -- Surfboard checks automatically every 6 hours, or use the Verify Domain API to trigger it manually
 4. **Monitor status** -- use the Fetch Store Details API to check the `onlineOnboardingStatus` field
 
@@ -398,5 +398,5 @@ Online stores in production require domain verification before they can process 
 - [Create Store API](https://developers.surfboardpayments.com/api/stores)
 - [Verify Domain API](https://developers.surfboardpayments.com/api/stores)
 - [Webhook Reference](https://developers.surfboardpayments.com/references/webhooks/merchants/application-completed)
-- [Service Providers & Split Payouts](/developers/guides/service-providers)
-- [Developer Portal](https://developers.surfboardpayments.com/)
+- [Service Providers & Split Payouts](/developers/guides/service-providers/)
+- [Integration portal](https://integrate.surfboardpayments.com/)

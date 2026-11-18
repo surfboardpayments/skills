@@ -14,19 +14,19 @@ generated: true
 
 The Payment Page is Surfboard's hosted checkout. You create an order against the store's `PaymentPage` terminal and the API returns a link to a page hosted by Surfboard. Redirect the customer to it from your own checkout, or send it by email, SMS or chat as a payment link. The customer pays there, is sent back to your site, and the card details never touch your infrastructure.
 
-The order call is the same [Create Order](/developers/guides/create-an-order) call you use in store. What changes is everything around it: the terminal must be an **online** terminal, that terminal must sit in an **online store**, and the store's domains must be verified before Surfboard will approve it. This guide walks the whole path once, then covers the `controlFunctions.online` block that shapes the page the customer lands on. If your online store is already approved, skip to [Step 4](#step-4-create-the-order).
+The order call is the same [Create Order](/developers/guides/create-an-order/) call you use in store. What changes is everything around it: the terminal must be an **online** terminal, that terminal must sit in an **online store**, and the store's domains must be verified before Surfboard will approve it. This guide walks the whole path once, then covers the `controlFunctions.online` block that shapes the page the customer lands on. If your online store is already approved, skip to [Step 4](#step-4-create-the-order).
 
-If you want to render the card fields inside your own page instead of sending the customer away, use the [Self-Hosted Checkout](/developers/guides/self-hosted-checkout) guide. If you want to charge a stored card from your backend with no customer present, see [Server-to-Server API](/developers/guides/server-to-server-api).
+If you want to render the card fields inside your own page instead of sending the customer away, use the [Self-Hosted Checkout](/developers/guides/self-hosted-checkout/) guide. If you want to charge a stored card from your backend with no customer present, see [Server-to-Server API](/developers/guides/server-to-server-api/).
 
 ## Prerequisites
 
-1. A developer account at the [Developer Portal](https://developers.surfboardpayments.com/sign-up)
+1. A developer account at the [integration portal](https://integrate.surfboardpayments.com/signup)
 2. A merchant that has completed onboarding and KYB
 3. Control of the DNS, or of the web server, for the webshop domain you are going to register
 
-Orders on the Payment Page are **customer-initiated transactions (CIT)**: the customer is present and completes the payment. **Merchant-initiated transactions (MIT)**, such as subscription renewals charged from your backend, can only be processed by a `MerchantInitiated` terminal. See [Server-to-Server API](/developers/guides/server-to-server-api).
+Orders on the Payment Page are **customer-initiated transactions (CIT)**: the customer is present and completes the payment. **Merchant-initiated transactions (MIT)**, such as subscription renewals charged from your backend, can only be processed by a `MerchantInitiated` terminal. See [Server-to-Server API](/developers/guides/server-to-server-api/).
 
-> **Demo environment:** payment page mode is the only online terminal type supported in demo, and only test cards work there. Real cards used in demo are voided automatically after 30 minutes and never settle.
+> **Demo environment:** only test cards work in demo. Real cards used in demo are voided automatically after 30 minutes and never settle.
 
 ## Step 1: Create an Online Store
 
@@ -69,7 +69,7 @@ POST /partners/:partnerId/merchants/:merchantId/stores
 | `onlineInfo.merchantWebshopURL` | Yes | The URL of the merchant's webshop. Verified by DNS. |
 | `onlineInfo.termsAndConditionsURL` | Yes | The webshop's terms and conditions. Must include the refund policy. Shown on the Payment Page. |
 | `onlineInfo.privacyPolicyURL` | Yes | The webshop's privacy policy. Shown on the Payment Page. |
-| `onlineInfo.paymentPageHostURL` | No | The URL that hosts the payment page. Only required for [Self-Hosted Checkout](/developers/guides/self-hosted-checkout) (SDK mode), not for the Payment Page. Verified by DNS when present. |
+| `onlineInfo.paymentPageHostURL` | No | The URL that hosts the payment page. Only required for [Self-Hosted Checkout](/developers/guides/self-hosted-checkout/) (SDK mode), not for the Payment Page. Verified by DNS when present. |
 | `onlineInfo.googlePayMerchantId` | No | Your Google Pay merchant identifier, used to enable Google Pay on the online store. Not needed for the Payment Page. |
 
 To turn an existing physical store into an online store instead, send the same `onlineInfo` block to [Update Store Details](https://developers.surfboardpayments.com/api/stores). The response carries the same verification keys:
@@ -104,7 +104,7 @@ Terms, privacy policy and contact details must also be visible on the webshop it
 
 ## Step 2: Verify the Domains
 
-The response carries one verification key per URL. Publish each as a **TXT record** on the matching domain, or, if you can't edit the domain's DNS, serve it as plain text at `https://<your-domain>/.well-known/sb-domain-verification.txt` (see [Store Management](/developers/guides/store-management#option-b-https-file) for the file format). Then ask Surfboard to check it:
+The response carries one verification key per URL. Publish each as a **TXT record** on the matching domain, or, if you can't edit the domain's DNS, serve it as plain text at `https://<your-domain>/.well-known/sb-domain-verification.txt` (see [Online Store Domains](/developers/guides/online-store-domains/#publish-the-verification-key) for both formats). Then ask Surfboard to check it:
 
 ```json
 POST /partners/:partnerId/merchants/:merchantId/stores/:storeId/verify
@@ -121,7 +121,7 @@ Verification is what unlocks the online terminal types: until the webshop domain
 GET /partners/:partnerId/merchants/:merchantId/stores/:storeId/online
 ```
 
-See [Store Management](/developers/guides/store-management) for the full store lifecycle.
+Approval usually takes 30 minutes to an hour once the domains are verified. See [Online Store Domains](/developers/guides/online-store-domains/) for how verification and approval work, including sharing one domain across stores, and [Store Management](/developers/guides/store-management/) for the full store lifecycle.
 
 ## Step 3: Pick Up the Terminal You Already Have
 
@@ -252,7 +252,7 @@ POST /orders
 
 Keep the `orderId`. Everything afterwards is keyed on it, and unlike an in-store order there is no `paymentId` yet: nothing has been attempted until the customer opens the page. The `paymentId` arrives with the first attempt, in the status response and in the webhook.
 
-Line items, tax, adjustments, customer objects and the order-level calculation rules all behave exactly as they do in store. [Create an Order](/developers/guides/create-an-order) covers them in full.
+Line items, tax, adjustments, customer objects and the order-level calculation rules all behave exactly as they do in store. [Create an Order](/developers/guides/create-an-order/) covers them in full.
 
 ## Control Functions for Online Orders
 
@@ -265,7 +265,7 @@ Everything that shapes the page itself -- where the customer lands afterwards, h
 | `failureRedirectUrl` | string | Where the customer lands after a failure. Also carries the `orderId`. |
 | `generateShortLink` | boolean | Returns `shortLinkUrl` alongside the full link. Default `false`. |
 | `payButtonType` | string | The label on the button: `PAY`, `DONATE`, `BOOK`, `ORDER`, `CHECKOUT`, `CONTINUE`, `CONTRIBUTE`, `ADD_MONEY`, `RENT`, `SUPPORT`, `TIP`, `TOP_UP`. |
-| `enforce3DSecure` | boolean | Force 3-D Secure where the issuer supports it. |
+| `enforce3DSecure` | boolean | Force a 3-D Secure challenge where the issuer supports it. Leave it unset if you want frictionless payments to stay possible. |
 | `relaxed3ds` | boolean | Ask for fewer customer details on card payments. See [Collect fewer customer details](#collect-fewer-customer-details). |
 | `addressRequirements` | boolean | Ask for an address on the page. |
 | `enforceTokenization` | boolean | Save the card for later use, overriding the terminal configuration. |
@@ -285,7 +285,7 @@ These sit directly on `controlFunctions`, next to `online`. They are not online-
 | `initiatePaymentsOptions` | object | Start the payment with a given `paymentMethod`, for example `CARD`. |
 | `lockToPaymentMethods` | array | Restrict the page to the methods you list, e.g. `["CARD", "KLARNA"]`. |
 | `authMode` | string | `AUTH` (default) charges the card when the customer pays. `PRE-AUTH` only holds the amount and sets `delayCapture` for you; you capture the final amount, lower or higher, later. |
-| `delayCapture` | boolean | Authorize now, capture later. See [Capture a Payment](/developers/guides/capture-a-payment). |
+| `delayCapture` | boolean | Authorize now, capture later. See [Capture a Payment](/developers/guides/capture-a-payment/). |
 | `delayPayout` | string | Hold the payout for a period, as `<number><unit>`. |
 | `cancelPreviousPendingOrder` | boolean | Cancel all previous pending orders when this one is created. |
 | `callBackUrl` | string | Per-order webhook URL for this order and its payments. |
@@ -362,7 +362,7 @@ For a subscription, add the `recurring` object inside `online` and mark the orde
 }
 ```
 
-The first payment is a customer-initiated transaction on the page, which is where the card is tokenized and 3-D Secure is satisfied. Every renewal after that is a merchant-initiated transaction against the stored token, charged from your backend through a `MerchantInitiated` terminal. [Recurring Payments](/developers/guides/recurring-payments) has the renewal side.
+The first payment is a customer-initiated transaction on the page, which is where the card is tokenized and 3-D Secure is satisfied. Every renewal after that is a merchant-initiated transaction against the stored token, charged from your backend through a `MerchantInitiated` terminal. [Recurring Payments](/developers/guides/recurring-payments/) has the renewal side.
 
 | Field | Description |
 |-------|-------------|
@@ -405,7 +405,7 @@ The states are the same as in store. An order sits in `PENDING` while the link i
 |--------------|---------|
 | `PENDING` | The link has not been paid yet, or the last attempt failed or was cancelled. |
 | `PAYMENT_COMPLETED` | Paid in full. The order is closed. |
-| `PARTIAL_PAYMENT_COMPLETED` | Part of the total is paid. See [Partial Payments](/developers/guides/partial-payments). |
+| `PARTIAL_PAYMENT_COMPLETED` | Part of the total is paid. See [Partial Payments](/developers/guides/partial-payments/). |
 | `PAYMENT_CANCELLED` | The order was cancelled. |
 
 Subscribe to `order.paymentcompleted` and `order.paymentfailed` rather than polling on a timer. The payload carries the `orderId`, your `referenceId`, the amount and the transaction details, and each delivery carries a `metadata.eventId` you should use for idempotency — Surfboard retries a failed delivery twice, after 5 and 10 minutes.
@@ -431,7 +431,7 @@ Subscribe to `order.paymentcompleted` and `order.paymentfailed` rather than poll
 }
 ```
 
-See [Webhooks](/developers/guides/webhooks-notifications) for subscription and signature verification.
+See [Webhooks](/developers/guides/webhooks-notifications/) for subscription and signature verification.
 
 ## Sending the Link
 
@@ -478,14 +478,14 @@ Create-order failures come back as `status: "ERROR"` with an `OR_*` or `PS_*` co
 
 If the store's terminal list comes back without a `PaymentPage` entry, the store was created without `onlineInfo` — the two default terminals only come with an online store. A terminal that will not register, or one that is there but refuses a payment, usually means the store has not cleared domain verification or is still in approval. Check the store's online status before you look at the terminal call.
 
-The [Create Order Error Codes](/developers/guides/create-order-error-codes) reference lists the rest, including errors raised by the payment initiation that happens inside the same call.
+The [Create Order Error Codes](/developers/guides/create-order-error-codes/) reference lists the rest, including errors raised by the payment initiation that happens inside the same call.
 
 ## Next Steps
 
-- [Self-Hosted Checkout](/developers/guides/self-hosted-checkout) — keep the customer on your own page
-- [Server-to-Server API](/developers/guides/server-to-server-api) — charge a stored card with no customer present
-- [Capture a Payment](/developers/guides/capture-a-payment) — finalize a delayed-capture authorization
-- [Refund an Order](/developers/guides/refund-an-order) — return funds after settlement
+- [Self-Hosted Checkout](/developers/guides/self-hosted-checkout/) — keep the customer on your own page
+- [Server-to-Server API](/developers/guides/server-to-server-api/) — charge a stored card with no customer present
+- [Capture a Payment](/developers/guides/capture-a-payment/) — finalize a delayed-capture authorization
+- [Refund an Order](/developers/guides/refund-an-order/) — return funds after settlement
 
 ## Reference
 
@@ -493,4 +493,4 @@ The [Create Order Error Codes](/developers/guides/create-order-error-codes) refe
 - [Terminals API](https://developers.surfboardpayments.com/api/terminals)
 - [Create Order API](https://developers.surfboardpayments.com/api/orders)
 - [Payments API](https://developers.surfboardpayments.com/api/payments)
-- [Developer Portal](https://developers.surfboardpayments.com/)
+- [Integration portal](https://integrate.surfboardpayments.com/)

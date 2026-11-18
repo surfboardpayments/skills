@@ -130,80 +130,33 @@ When an online store is created, the response includes two domain verification k
 - `merchantURLDomainVerficationKey` -- used to verify ownership of the webshop domain
 - `paymentPageURLDomainVerficationKey` -- used to verify the payment page domain (if provided)
 
-You must complete domain verification before the store is approved for online payments.
+You must complete [domain verification](/developers/guides/online-store-domains/) before the store is approved for online payments.
 
 ## Domain Verification
 
-After creating an online store, verify that you own the domains you provided. This is a two-step process: publish the verification key, then trigger the check.
+Before an online store can take payments, you verify the domains you registered on it and Surfboard approves the store. In short:
 
-### Step 1: Publish the Verification Keys
+1. Publish each domain's verification key, as a DNS TXT record or as a file at `https://<your-domain>/.well-known/sb-domain-verification.txt`. Fetch the keys at any time with [Fetch Store Domains](https://developers.surfboardpayments.com/api/stores):
 
-The keys are returned when the store is created, and you can fetch them again at any time with [Fetch Store Domains](https://developers.surfboardpayments.com/api/stores):
+   ```
+   GET /partners/:partnerId/merchants/:merchantId/stores/:storeId/online
+   ```
 
-```
-GET /partners/:partnerId/merchants/:merchantId/stores/:storeId/online
-```
+2. Trigger the check, or wait for the automatic one that runs every 6 hours:
 
-Each entry in `domains` carries the domain `name` to verify and its `verificationKey`. Publish each key in one of two ways.
+   ```
+   POST /partners/:partnerId/merchants/:merchantId/stores/:storeId/verify
+   ```
 
-#### Option A: DNS TXT record
+   ```json
+   {
+     "domainType": "MERCHANT_WEBSHOP_URL"
+   }
+   ```
 
-Add the verification key as a **TXT record** in the domain's DNS configuration.
+3. Once verified, the store goes through approval and can then take online payments.
 
-#### Option B: HTTPS file
-
-If you can serve pages on the domain but can't edit its DNS, serve the key from a well-known file instead. This suits platforms that host a merchant's custom domain while the DNS stays with the merchant's own provider: you can publish the file for every merchant automatically, with no action from them.
-
-Serve the file on the same host as the URL you registered on the store:
-
-```
-https://<your-domain>/.well-known/sb-domain-verification.txt
-```
-
-If the store's URL is `https://www.example.com`, serve it at `https://www.example.com/.well-known/sb-domain-verification.txt`. Serving it on the root domain, `https://example.com/.well-known/sb-domain-verification.txt`, also works. You only need one of the two.
-
-- The URL you serve it on must return `200` directly over HTTPS, with no redirect. If your root domain redirects to `www`, serve the file on the `www` host.
-- Serve it as plain text (`Content-Type: text/plain`), not JSON.
-- The body is the verification key with its `sb-domain-verification-key=` prefix.
-- If the store has two keys (webshop and payment page) on the same domain, put both in the same file, one per line.
-
-```
-sb-domain-verification-key=7fd242dd862a9f9f74ae11d62216f5729a5e5600e00b8d44300db41b4efcce68
-```
-
-Check it before you trigger verification:
-
-```bash
-curl -i https://www.example.com/.well-known/sb-domain-verification.txt
-```
-
-The response should be `200` with `content-type: text/plain` and the key in the body.
-
-### Step 2: Trigger Verification
-
-Surfboard checks pending domains automatically every 6 hours, through either method, so a store waiting for verification is picked up without further action once the record or file is live. To verify right away, call:
-
-```
-POST /partners/:partnerId/merchants/:merchantId/stores/:storeId/verify
-```
-
-```json
-{
-  "domainType": "MERCHANT_WEBSHOP_URL"
-}
-```
-
-The `domainType` value specifies which domain to verify. Use `MERCHANT_WEBSHOP_URL` for the webshop domain or `PAYMENT_PAGE_HOST_URL` for the payment page domain.
-
-### Check Verification Status
-
-You can retrieve the current domain verification status at any time:
-
-```
-GET /partners/:partnerId/merchants/:merchantId/stores/:storeId/online
-```
-
-Once verification succeeds, the store enters an internal approval process. After approval, the store can take online payments.
+A domain is verified once per partner, and several stores and merchants can share it. The [Online Store Domains](/developers/guides/online-store-domains/) guide covers the key formats, sharing a domain, approval times, and what approval unlocks for the Online SDK and Apple Pay.
 
 ### Default Online Terminals
 
@@ -295,7 +248,7 @@ PUT /partners/:partnerId/merchants/:merchantId/stores/:storeId
 
 All parameters are optional. You can also add `onlineInfo` to convert a physical store into an online store. Note that online info can only be added once.
 
-If you add `onlineInfo` during an update, the response will include the domain verification keys, and you must complete domain verification as described above.
+If you add `onlineInfo` during an update, the response will include the domain verification keys, and you must complete [domain verification](/developers/guides/online-store-domains/).
 
 ## Fetch Store Terminals
 

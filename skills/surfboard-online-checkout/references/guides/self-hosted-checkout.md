@@ -16,12 +16,51 @@ The Self-Hosted Checkout (Online SDK) lets you embed payment fields directly in 
 
 Surfboard renders secure input fields inside your page using the Online SDK. You control the layout, branding, and customer experience.
 
+This guide walks the whole path once, from an empty account to a confirmed payment:
+
+1. Create an online store with the URL of your checkout page.
+2. Verify the domain and wait for the store to be approved.
+3. Register a `SelfHostedPage` terminal and keep its `publicKey` and `sdkUrl`.
+4. Create an order from your backend. It returns the `orderId` and `nonce`.
+5. Initialize the SDK on your checkout page with those three values.
+6. Take the payment with the method the customer picks.
+7. Confirm the payment from your backend.
+
+If your online store is already approved, skip to [Step 3](#step-3-register-a-selfhostedpage-terminal).
+
 ## Prerequisites
 
-1. Create a developer account at the [Developer Portal](https://developers.surfboardpayments.com/sign-up)
-2. Complete onboarding (merchant and store setup)
-3. Register a terminal with the type set to **SelfHostedPage**
-4. Note the terminal's `publicKey` from the registration response
+1. A developer account with an API key and secret. See [Getting Started](/developers/guides/getting-started/).
+2. A merchant to take payments for. See [Merchant Onboarding](/developers/guides/merchant-onboarding/). In the demo environment the application is approved automatically.
+3. Control of the DNS, or of the web server, for the domain your checkout page runs on.
+
+## Step 1: Create the Online Store
+
+The SDK only runs on a page that belongs to an online store. Create the store with `onlineInfo`, and set `paymentPageHostURL` to the page your checkout runs on:
+
+```json
+POST /partners/:partnerId/merchants/:merchantId/stores
+{
+  "storeName": "Web Store",
+  "email": "webstore@example.com",
+  "phoneNumber": {
+    "code": 46,
+    "number": "701234567"
+  },
+  "address": "Drottninggatan 10",
+  "city": "Stockholm",
+  "zipCode": "103 16",
+  "country": "SE",
+  "onlineInfo": {
+    "merchantWebshopURL": "https://shop.example.com",
+    "paymentPageHostURL": "https://shop.example.com/checkout",
+    "termsAndConditionsURL": "https://shop.example.com/terms",
+    "privacyPolicyURL": "https://shop.example.com/privacy"
+  }
+}
+```
+
+`paymentPageHostURL` is optional on the API but required for the SDK. Online info can only be set once, so if you want [Google Pay](#google-pay), get your Google Pay merchant ID first and send it in the same call. See [Create an Online Store](/developers/guides/store-management/#create-an-online-store) for every field.
 
 ### One Store per Checkout Domain
 
@@ -29,17 +68,116 @@ The SDK sends the host of the page it runs on, and Surfboard checks it against t
 
 If a merchant takes payments on more than one domain, for example their own webshop and a white-label site, create one online store per domain, each with its own `paymentPageHostURL` and its own SelfHostedPage terminal.
 
-Each `paymentPageHostURL` has to pass domain verification before the store can take payments. If you host checkout on merchants' custom domains but their DNS sits with their own provider, you don't need them to add a TXT record: serve the verification key from `https://<your-domain>/.well-known/sb-domain-verification.txt` instead. See [Domain Verification](/developers/guides/store-management#domain-verification) for the file format.
+The rule only runs one way. Each store has one checkout host, but one host can serve several stores, under the same merchant or under different merchants of your partner. A domain is verified once per partner, and every other store that uses it is verified automatically.
 
-> **Tip:** You can retrieve the terminal's public key later using the [Fetch Terminal by ID API](https://developers.surfboardpayments.com/api/terminals). It is returned as `terminalPublicKey` in the response.
+## Step 2: Verify the Domain
 
-## Initializing the SDK
+Each `paymentPageHostURL` has to pass domain verification, and the store has to be approved, before the SDK can take payments. Until then, the SDK's requests from the page fail with a CORS error, because Surfboard only allows the domains of approved stores.
 
-To initialize the SDK, you need three parameters:
+1. Fetch the verification key for each domain:
 
-1. **`publicKey`** -- From terminal registration
-2. **`orderId`** -- From the [Create Order API](https://developers.surfboardpayments.com/api/orders) response
-3. **`nonce`** -- From the Create Order response (serves as access control)
+   ```
+   GET /partners/:partnerId/merchants/:merchantId/stores/:storeId/online
+   ```
+
+2. Publish it as a DNS TXT record, or serve it from `https://<your-domain>/.well-known/sb-domain-verification.txt`. The file suits platforms that host checkout on merchants' custom domains while the DNS sits with the merchant's own provider.
+
+3. Trigger the check, once for each domain type you registered, or wait for the automatic one that runs every 6 hours:
+
+   ```json
+   POST /partners/:partnerId/merchants/:merchantId/stores/:storeId/verify
+   {
+     "domainType": "PAYMENT_PAGE_HOST_URL"
+   }
+   ```
+
+4. Follow `onlineStoreStatus` on the first call until it reads `APPROVED`. Approval usually takes 30 minutes to an hour once the domains are verified.
+
+While you wait, host the [Apple Pay domain association file](#domain-verification) on the same domain. Apple Pay is registered for the domain when the store is approved, so having the file in place first saves a round trip.
+
+See [Online Store Domains](/developers/guides/online-store-domains/) for both key formats, approval, and troubleshooting.
+
+## Step 3: Register a SelfHostedPage Terminal
+
+An online terminal is a mode, not a device. The store comes with a `PaymentPage` and a `MerchantInitiated` terminal, but the one the SDK uses has to be registered:
+
+```json
+POST /merchants/:merchantId/stores/:storeId/online-terminals
+{
+  "onlineTerminalMode": "SelfHostedPage"
+}
+```
+
+```json
+// Response
+{
+  "status": "SUCCESS",
+  "data": {
+    "terminalId": "813ca2cb12ce400407",
+    "publicKey": "YOUR_PUBLIC_KEY",
+    "registrationStatus": "REGISTERED",
+    "sdkUrl": "YOUR_SDK_URL"
+  },
+  "message": "Terminal registered successfully"
+}
+```
+
+Keep all three values:
+
+- **`terminalId`** goes on every order you create for this checkout.
+- **`publicKey`** goes to the SDK in the browser.
+- **`sdkUrl`** is where your checkout page loads the SDK from. It is specific to this terminal, so store it in configuration next to the public key rather than copying one from an example.
+
+> **Tip:** You can retrieve both later using the [Fetch Terminal by ID API](https://developers.surfboardpayments.com/api/terminals). The public key is returned as `terminalPublicKey`, the SDK URL as `sdkUrl`.
+
+## Step 4: Create the Order
+
+Create the order from your backend when the customer reaches checkout, with the `SelfHostedPage` terminal as `terminal$id`. Never call this from the browser: it carries your API key and secret.
+
+```json
+POST /orders
+{
+  "terminal$id": "813ca2cb12ce400407",
+  "referenceId": "order-2026-0418",
+  "orderLines": [
+    {
+      "id": "ITEM-001",
+      "name": "Nike Shoes",
+      "quantity": 1,
+      "amount": {
+        "regular": 50000,
+        "total": 50000,
+        "currency": "752",
+        "tax": [{ "amount": 10000, "percentage": 25, "type": "VAT" }]
+      }
+    }
+  ],
+  "totalOrderAmount": {
+    "regular": 50000,
+    "total": 50000,
+    "currency": "752",
+    "tax": [{ "amount": 10000, "percentage": 25, "type": "VAT" }]
+  }
+}
+```
+
+The response carries the `orderId` and, for a `SelfHostedPage` terminal, a `nonce`. Pass both to your checkout page. The nonce is what authorizes the browser to pay this one order, so it is safe to send to the page where your API secret is not.
+
+Amounts are integers in the smallest currency unit and prices include tax. Line items, tax, customer details and adjustments are covered in [Create an Order](/developers/guides/create-an-order/).
+
+## Step 5: Initialize the SDK
+
+Load the SDK on your checkout page from the terminal's `sdkUrl`, once per page:
+
+```html
+<script src="YOUR_SDK_URL"></script>
+```
+
+The script exposes `SurfboardOnlineSDK` on `window`. To initialize it, you need three parameters:
+
+1. **`publicKey`** -- From terminal registration in step 3
+2. **`orderId`** -- From the Create Order response in step 4
+3. **`nonce`** -- From the same response (serves as access control)
 
 ```javascript
 // Set up error handling
@@ -96,7 +234,9 @@ After successful initialization, the SDK exposes data objects on `SurfboardOnlin
 
 > **Warning:** You are required to display the store contact information, privacy policy, and terms and conditions on your payment page.
 
-## Payment Flow
+## Step 6: Take the Payment
+
+`SurfboardOnlineSDK.paymentMethods` lists the methods available on this terminal. Cards are on by default. Swish, Klarna and the others are switched on per merchant, see [Payment Methods](/developers/guides/payment-methods/). Apple Pay and Google Pay each have a domain step of their own, described below.
 
 ### Updating Customer Information
 
@@ -124,6 +264,8 @@ await SurfboardOnlineSDK.order.addCustomerInformation({
 
 > **Tip:** Include the customer address in the Create Order API request when you have it. This pre-fills the address so the customer does not need to enter it manually.
 
+The billing address is optional on Create Order, but it is all or nothing: if you send `billing.address`, then `addressLine1`, `city`, `postalCode` and `countryCode` are all required. If you only have part of the address, leave the block out.
+
 #### Collecting fewer details with relaxed 3-D Secure
 
 If you don't want to ask for a full billing address on card payments, set `relaxed3ds` to `true` in `controlFunctions.online` when you [create the order](https://developers.surfboardpayments.com/api/orders):
@@ -140,7 +282,7 @@ POST /orders
 }
 ```
 
-With `relaxed3ds` on, a card payment only needs email **or** phone, plus postal code and country code. Street address and city aren't needed:
+With `relaxed3ds` on, a card payment only needs email **or** phone, plus postal code and country code. Street address and city aren't needed. Send the short address through `addCustomerInformation` as below, not on Create Order, where a billing address still needs every field:
 
 ```javascript
 await SurfboardOnlineSDK.order.addCustomerInformation({
@@ -153,6 +295,10 @@ await SurfboardOnlineSDK.order.addCustomerInformation({
 ```
 
 > **Warning:** Don't fill the customer fields with generated or placeholder data, including a fixed set of details per country. The details are passed to the card issuer, who decides how to treat the payment. Fake details lower 3-D Secure approval rates and go against card scheme rules. Use `relaxed3ds` instead.
+
+#### Frictionless 3-D Secure
+
+The customer's name, email, phone and billing address are passed to the issuer during 3-D Secure, so sending real details when you have them makes it more likely the payment goes through without a challenge. Leave `enforce3DSecure` unset: setting it to `true` forces a challenge.
 
 ### Card Payments
 
@@ -173,15 +319,39 @@ await SurfboardOnlineSDK.order.initiatePayments("CARD");
 
 ### Swish Payments
 
-```javascript
-const paymentAttempt = await SurfboardOnlineSDK.order.initiatePayments("NSWISH");
+Swish uses the `NSWISH` payment method. How the customer pays depends on the device:
 
-// For mobile: redirect to Swish app
-const redirectUrl = paymentAttempt.getSwishAppRedirectUrl("https://your-site.com/callback");
+- **Desktop:** your page shows a QR code, and the customer scans it with the Swish app.
+- **Mobile:** the Swish app opens directly, and the customer is sent back to your checkout page afterwards.
 
-// For web: display QR code
-const qrData = paymentAttempt.getSwishQRData;
+The SDK returns the QR code and the app link, but it does not display anything on its own. Your page decides which one to use:
+
+```html
+<img id="swish-qr" alt="Scan with the Swish app" />
 ```
+
+```javascript
+const attempt = await SurfboardOnlineSDK.order.initiatePayments("NSWISH");
+if (attempt.code) return; // Did not start; the error has already gone to your errorCallback
+
+const onPhone = window.matchMedia("(pointer: coarse)").matches;
+if (onPhone) {
+    // Open the Swish app. The argument is the URL-encoded address of the
+    // page the customer returns to.
+    window.location.href = attempt.getSwishAppRedirectUrl(
+        encodeURIComponent("https://shop.example.com/checkout")
+    );
+} else if (attempt.getSwishQRData) {
+    // Show the QR code
+    document.getElementById("swish-qr").src = attempt.getSwishQRData;
+}
+```
+
+The result arrives through `paymentStatusCallback`, the same as for every other method. On mobile the customer leaves your page for the Swish app, so the page reloads when they return: initialize the SDK again with the same order, and the callback reports the order's status during initialization.
+
+> **Warning:** Swish payments on a test store are live Swish transactions and move real money. Test with small amounts, for example 1 SEK, and refund them afterwards.
+
+To refund a Swish payment, follow [Refund an Order](/developers/guides/refund-an-order/) with `"paymentMethod": "NSWISH"`, and always include `purchasePaymentId`, the `paymentId` of the original Swish payment.
 
 ### Apple Pay
 
@@ -200,11 +370,21 @@ SurfboardOnlineSDK.mount({
 
 Apple Pay only shows on domains that host Surfboard's domain association file:
 
-1. Download the [domain association file](https://firebasestorage.googleapis.com/v0/b/firebase-test-2e49.appspot.com/o/online-docs%2Fhost.txt?alt=media&token=a83e08cf-e178-4052-8829-dc9c7df414e5).
+1. Download the [domain association file](https://developer-portal-docs.web.app/files/apple-pay/apple-developer-merchantid-domain-association).
 2. Host it at `https://<your-domain>/.well-known/apple-developer-merchantid-domain-association`.
-3. Serve it as `text/plain`, publicly accessible, with no redirects.
+3. Serve it as `text/plain`, unmodified, publicly accessible, with no redirects.
+
+Check it before you test:
+
+```bash
+curl -i https://shop.example.com/.well-known/apple-developer-merchantid-domain-association
+```
+
+The response should be `200` with the file in the body. If it returns `404` or a redirect, Apple Pay fails even on an approved store.
 
 The same file works for every merchant, in test and production. There is no separate production file, and you don't need your own Apple Pay certificates.
+
+You don't register the domain with Apple yourself. Surfboard does that when the store is approved for online payments, so the button works once the file is in place and the store is approved. This is the same in the demo environment, so you can test Apple Pay there, in Safari. See [What Approval Unlocks](/developers/guides/online-store-domains/#what-approval-unlocks).
 
 ### Google Pay
 
@@ -250,6 +430,34 @@ await SurfboardOnlineSDK.order.addCustomerInformation({
 
 await SurfboardOnlineSDK.order.initiatePayments("KLARNA");
 ```
+
+## Step 7: Confirm the Payment
+
+`paymentStatusCallback` tells the page what happened, which is enough to show the customer a result. It is not enough to ship the order: the browser can be closed, or tampered with, before it reports back. Confirm from your backend.
+
+```
+GET /orders/:orderId/status
+```
+
+```json
+// Response
+{
+  "status": "SUCCESS",
+  "data": {
+    "orderStatus": "PAYMENT_COMPLETED",
+    "payments": [
+      {
+        "paymentId": "83a1ba3264bd500106",
+        "paymentStatus": "PAYMENT_COMPLETED",
+        "paymentMethod": "CARD",
+        "amount": 50000
+      }
+    ]
+  }
+}
+```
+
+Better still, subscribe to `order.paymentcompleted` and `order.paymentfailed` so your backend is told even when the customer never returns to your page. See [Webhooks](/developers/guides/webhooks-notifications/) for subscription and signature verification, and [Payment Lifecycle](/developers/guides/payment-lifecycle/) for every state.
 
 ## Styling the Card Fields
 
@@ -304,4 +512,4 @@ The `branding` data object gives you the merchant's colors, fonts, and logos if 
 - [React Sample App](https://github.com/surfboardpayments/react-next-online-sdk) for a complete working example
 - [Create Order API](https://developers.surfboardpayments.com/api/orders)
 - [Fetch Terminal API](https://developers.surfboardpayments.com/api/terminals)
-- [Developer Portal](https://developers.surfboardpayments.com/)
+- [Integration portal](https://integrate.surfboardpayments.com/)

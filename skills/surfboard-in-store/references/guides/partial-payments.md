@@ -168,5 +168,5 @@ Each partial payment can use a different method. For example, first payment by c
 
 - [Create Order API](https://developers.surfboardpayments.com/api/orders)
 - [Initiate Payment API](https://developers.surfboardpayments.com/api/payments)
-- [Create an Order](/developers/guides/create-an-order)
-- [Payment Lifecycle](/developers/guides/payment-lifecycle)
+- [Create an Order](/developers/guides/create-an-order/)
+- [Payment Lifecycle](/developers/guides/payment-lifecycle/)

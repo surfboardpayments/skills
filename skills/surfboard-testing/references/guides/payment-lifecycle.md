@@ -123,7 +123,7 @@ The `amount` field is only for `PRE-AUTH` orders, to capture a different amount 
 
 Check capture status with `GET /payments/:paymentId/capture`. Possible `captureStatus` values: `PENDING`, `SUCCESS`, `ERROR`.
 
-Card captures are processed asynchronously, so a `SUCCESS` response to the capture request does not mean the capture has completed, and no webhook is sent when it does. Poll the capture status instead. See [Capture a Payment](/developers/guides/capture-a-payment) for the full flow, including how long an authorization lasts.
+Card captures are processed asynchronously, so a `SUCCESS` response to the capture request does not mean the capture has completed, and no webhook is sent when it does. Poll the capture status instead. See [Capture a Payment](/developers/guides/capture-a-payment/) for the full flow, including how long an authorization lasts.
 
 ## Void a Payment
 
@@ -253,4 +253,4 @@ GET /orders/:orderId/status
 
 - [Create Order API](https://developers.surfboardpayments.com/api/orders)
 - [Payments API](https://developers.surfboardpayments.com/api/payments)
-- [Developer Portal](https://developers.surfboardpayments.com/)
+- [Integration portal](https://integrate.surfboardpayments.com/)

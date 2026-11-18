@@ -61,7 +61,7 @@ You get several variants back, not one. Show them to the merchant and let them c
 
 ### Wiring It Into Onboarding
 
-The natural place for this is the product catalog. A merchant uploads whatever photos they have, you enhance them in the background, and the catalog is presentable before they finish the rest of the form. See [Product Catalog](/developers/guides/product-catalog) for how products and variants are stored, and the POS template in [POS Templates](/developers/guides/pos-templates) for how they are laid out on the till.
+The natural place for this is the product catalog. A merchant uploads whatever photos they have, you enhance them in the background, and the catalog is presentable before they finish the rest of the form. See [Product Catalog](/developers/guides/product-catalog/) for how products and variants are stored, and the POS template in [POS Templates](/developers/guides/pos-templates/) for how they are laid out on the till.
 
 Treat the returned URLs as inputs you store, not as a live dependency: download them and put them in your own storage before pointing a catalog entry at them.
 
@@ -109,7 +109,7 @@ POST /ai/branding
 
 Each option is a complete set: background, brand and accent colours, a footer colour, a corner style and a font family, plus logo and icon URLs where they could be derived.
 
-These map onto the branding you can already configure for terminals, payment pages and portals, so the output of this call is the input to that one. [Partner Branding](/developers/guides/partner-branding) covers where each value lands and at which level it applies.
+These map onto the branding you can already configure for terminals, payment pages and portals, so the output of this call is the input to that one. [Partner Branding](/developers/guides/partner-branding/) covers where each value lands and at which level it applies.
 
 Present the options as a choice with a preview. Generated colour is a starting point that saves a merchant an hour, not a decision made on their behalf — and a brand colour applied without asking is the kind of surprise that generates a support ticket rather than delight.
 
@@ -123,6 +123,6 @@ Present the options as a choice with a preview. Generated colour is a starting p
 ## Reference
 
 - [AI API](https://developers.surfboardpayments.com/api/ai)
-- [Product Catalog](/developers/guides/product-catalog)
-- [Partner Branding](/developers/guides/partner-branding)
-- [POS Templates](/developers/guides/pos-templates)
+- [Product Catalog](/developers/guides/product-catalog/)
+- [Partner Branding](/developers/guides/partner-branding/)
+- [POS Templates](/developers/guides/pos-templates/)
